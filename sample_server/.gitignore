@@ -1,0 +1,5 @@
+# このファイルに記載したファイルはGithubに載らない
+
+# 今回、node_modulesフォルダの下は、Githubに載せる必要がない
+# npm install コマンド でインストールした外部のライブラリが全て入る
+/node_modules
