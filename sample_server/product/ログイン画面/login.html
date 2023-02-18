@@ -16,35 +16,39 @@
 <body>
  <title>会員登録画面</title>
 
- <form method="post" action="ここを入力後に飛ばしたい画面のhtmlを書く">
+ <button type="button" class="ログイン">ログイン</button>
+ <button type="button" class="新規登録">新規登録</button>
+
+ <form method="post" action="/Users/akari/Team-A/Team-A/sample_server/product/プロフィール画面/profile.html">
    <table width="1000" border="0">
     <!-- maxlengthは最大入力文字数で、今回は適当です。 -->
     <tr>
       <th>メールアドレス</th>
-      <th><input type="text" maxlength="254" placeholder="aaaa@gmail.com" id="mail"></th>
+      <th><input type="text" maxlength="254" placeholder="aaaa@gmail.com" id="mail" class = "put"></th>
       <th id = "mail_chk" style="display: none; color: red;">メールアドレスが形式に沿っていません</th>
     </tr>
 
     <tr>
       <th>パスワード</th>
-      <th><input type="password" maxlength="20" placeholder="半角英数8文字以上"id ="pass"></th>>
+      <th><input type="password" maxlength="20" placeholder="半角英数8文字以上"id ="pass" class = "put"></th>>
       <th id = "pass_chk" style="display: none; color: red;">パスワードが半角英数8文字以上になっていません</th>
     </tr>
   
     <tr>
       <th>パスワード再入力</th>
-      <th><input type="password" maxlength="20" placeholder="半角英数8文字以上" id="repass"></th>>
-      <th id = "repass_chk" style="display: none; color: red;">パスワードが登録時と異なっています</th>
+      <th><input type="password" maxlength="20" placeholder="半角英数8文字以上" id="repass" class = "put"></th>>
+      <th id = "repass_chk" style="display: none; color: rgb(255, 160, 160);">パスワードが登録時と異なっています</th>
     </tr>
    </table>
 
     <br/>
-    <input type="submit" value="新規会員登録" id="touroku">
+    <div class = "botton">
+      <input type="submit" id="touroku" >
 
+    </div>
 
-
-  <script>
-   document.getElementById("touroku").onclick = function() {
+    <script>
+     document.getElementById("touroku").onclick = function() {
       const mail = document.getElementById("mail").value;
       const pass = document.getElementById("pass").value;
       const repass = document.getElementById("repass").value;
@@ -88,11 +92,11 @@
        } else { 
          return true };
       
-   }
+     }
    
 
-   </script>
-</form>
+    </script>
+ </form>
 
 </body>
  
