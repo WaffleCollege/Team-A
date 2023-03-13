@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Monaco Editor - Text Form Example</title>
+    <!-- Load the Monaco Editor library -->
+    <script src="https://unpkg.com/monaco-editor@0.27.0/min/vs/loader.js"></script>
+    <script>
+      // ここに実行後のコードを入れる
+      
+      // Monaco Editorに組み込まれたJavaScriptファイルおよびモジュールを組み込むRequireを利用する
+      // Monaco Editor scriptsより先にここがコールされる必要がある
+      // Monaco Editor
+      require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@0.27.0/min/vs' } });
+      // Load the Monaco Editor scripts
+      require(['vs/editor/editor.main'], function() {
+        const editorElement = document.getElementById('editor');
+          window.editor = monaco.editor.create(editorElement, {
+          value: '',
+          language: 'javascript'
+        })
+});
+
+function save() {
+   // get the value of the data
+   var value = window.editor.getValue()
+   editorValue =  saveValueSomewhere(value.join('\n'));     
+}
+  </script>   
+  </head>
+  
+   <body>
+    <!-- Create the text form element -->
+    <form id="form1" name="form1" action="/compile" method="post">
+      <label for="editor">Code:</label>
+      <div id="editor" name = "editor" style="height: 300px;"></div>
+      <br>
+    <div>
+      <input id="btn" type="submit" value= "実行">実行</input>
+    </div>
+    </form> 
+
+    <h3>結果</h3>
+    <div id="output"></div>
+
+</body>
+</html>
