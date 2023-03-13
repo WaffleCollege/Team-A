@@ -7,6 +7,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 # todo.dbの注意点 pip install Flask-SQLAlchemy==2.5.0 (ターミナル)、anaconda～のバグはapp.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False（app.py）
+#仮想環境 env\Scripts\activate
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(30), nullable=False)
