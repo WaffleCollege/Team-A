@@ -36,6 +36,7 @@
     padding-bottom: 50px;
 }
 
+
 /* 改善：ボタンを押すと全部消えるのなおす */
 .d-grid > .btn{
    background-color: rgb(255, 223, 153);
