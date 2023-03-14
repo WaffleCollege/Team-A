@@ -16,14 +16,11 @@ app.use(
   })
 );
 
-
 // テンプレートエンジンの設定
 app.set("view engine", "ejs");
 
 // htmlやcssファイルが保存されている publicフォルダ を指定
 app.use("/static", express.static(path.join(__dirname, "public")));
-
-
 
 // DBに接続
 var pool = new pg.Pool({
