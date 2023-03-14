@@ -329,3 +329,52 @@ select * from comments;
         ].join('\n'),
         language: 'javascript'
     });
+
+
+        <script src="https://unpkg.com/monaco-editor@0.27.0/min/vs/loader.js"></script>
+    <script>
+      // ここに実行後のコードを入れる
+      
+      // Monaco Editorに組み込まれたJavaScriptファイルおよびモジュールを組み込むRequireを利用する
+      // Monaco Editor scriptsより先にここがコールされる必要がある
+      // Monaco Editor
+      require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@0.27.0/min/vs' } });
+      // Load the Monaco Editor scripts
+      require(['vs/editor/editor.main'], function() {
+        const editorElement = document.getElementById('editor');
+          window.editor = monaco.editor.create(editorElement, {
+          value: '',
+          language: 'javascript'
+        })
+});
+
+function save() {
+   // get the value of the data
+   var value = window.editor.getValue()
+   editorValue =  saveValueSomewhere(value.join('\n'));     
+}
+
+      function save() {
+      // get the value of the data
+      var value = window.editor.getValue()
+      editorValue =  saveValueSomewhere(value.join('\n'));     
+      }
+  </script>   
+
+      <form id="form1" name="form1" action="/compile" method="post">
+      <label for="editor">Code:</label>
+      <div id="editor" name = "editor" style="height: 300px;"></div>
+      <br>
+    <div>
+      <input id="HTMLbutton" type="submit" value= "実行">実行</input>
+    </div>
+    </form> 
+
+       <div class="input">
+          <input type="text" id="word" placeholder="word" class="search-text" />
+          <input type="text" id="num" placeholder="limit" class="search-text" />
+          <button type="submit" id="button" class="search-button">
+            <div id="text-button" onclick="pushButton()">
+              <img src="https://i.ibb.co/SN1SDhM/typing-fast-typing.gif" />
+            </div>
+          </button>
