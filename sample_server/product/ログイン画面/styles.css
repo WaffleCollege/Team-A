@@ -1,0 +1,54 @@
+html {
+    /* text-align: center; */
+    font-family: "ヒラギノ角ゴ Pro W3";
+    font-size: 20px;
+    font-weight: bold;
+}
+
+
+
+body {
+    background-color: white;
+    text-align : center ; 
+}
+
+button {
+    font-size: 24px;
+    border: none;
+    color: rgba(136, 136, 136, 1);
+    width: 250px;
+    height: 60px;
+}
+
+table {
+    margin: auto;
+}
+
+tr {
+    font-size: 30px;
+    height: 50px;
+    color: rgb(119, 119, 119);
+
+}
+
+.put {
+    background-color: rgb(213, 213, 213);
+    border-radius:5px;
+    border-width: 1px;
+    width: 250px;
+    height: 40px;
+}
+
+input{
+    width: 250px;
+    height: 60px;
+    font-size:18px;
+    background-color: rgba(82, 109, 205, 1);
+    border: none;
+    border-radius: 10px;
+}
+
+
+
+
+

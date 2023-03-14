@@ -3,44 +3,53 @@
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="../static/style.css" />
-    <title>情報ホーム</title>
+    <link rel="stylesheet" href="../static/signup.css" />
+    <title>新規登録画面</title>
     <script defer src="../static/index.js"></script>
   </head>
 
   <body>
-    <div class="sign">
-      <div class="container">
-        <h1><a href="/list">BLOG</a></h1>
+    <div class="form-wrapper">
+       <h3>アカウント登録</h3>
+        <!-- りつ：コメントアウト(9:47)<h1><a href="/list">BLOG</a></h1> -->
         <div class="panel">
-          <h2>新規登録</h2>
           <% if (errors.length > 0) { %>
-            <ul class="errors">
+            <ul class="errors" style="list-style: none;">
               <% errors.forEach(error => { %>
                 <li><%= error %></li>
               <% }); %>
             </ul>
           <% } %>
-          <!-- <form>タグに送信先URLと送信方法を指定してください。 -->
-          <form action = "/signup" , method = "post">
-            <!-- ユーザー名とメールアドレス、パスワードの<input>タグにname属性をつけてください。-->
-            <p>ユーザー名</p>
-            <input type="text" name="username">
-            <p>メールアドレス</p>
-            <input type="text" name = "email">
-            <p>パスワード</p>
-            <input type="password" name="password">
-            <input type="submit" value="登録する">
-            <a href="/list">一覧にもどる</a>
-          </form>
         </div>
-      </div>
+        
+           <!-- <form>タグに送信先URLと送信方法を指定してください。 -->
+           <form action = "/signup" , method = "post">
+              <!-- ユーザー名とメールアドレス、パスワードの<input>タグにname属性をつけてください。 -->
+               <!-- Username -->
+               <div class="form-item">
+                 <input type="text" name="username" placeholder="ユーザーネーム">
+               </div>
+               
+               <!-- Email -->
+                <div class="form-item"> 
+                    <input type="text" name = "email" placeholder="メールアドレス" >
+                </div>
+
+                <!-- password -->
+                <div class="form-item"> 
+                    <input type="password" name="password" placeholder="パスワード">
+                 </div>
+                  
+               
+                 <div class="button-panel">
+                  <input type="submit" class="button" value="登録"></input>
+                </div>
+
+                
+              
+
+          </form>
+        
     </div>
-
-
-<!-- bootstrap -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
-</html>
+</html> 
