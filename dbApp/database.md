@@ -378,3 +378,38 @@ function save() {
               <img src="https://i.ibb.co/SN1SDhM/typing-fast-typing.gif" />
             </div>
           </button>
+
+     <div><iframe  class= "frame_center" src="https://widgets.judge0.com/" width="600" height="900"></iframe> </div>
+     
+           //  function saveI() 
+      //   {
+      //       // get the value of the data
+      //       const Value = window.editor.getValue();
+      //       console.log(Value);
+      //       editorValue =  Value;
+      //       //あとはsaveValueSomewhere()にapp.jsからfetchする内容を書く。app.jsがAPI扱いということ。
+      //saveValueSomewhere(Value.join('\n'));
+      //       const result = saveValueSomewhere(editorValue);
+      //   };
+      //   window.addEventListener('DOMContentLoaded', function () {
+      //     document.getElementById('HTMLbutton').onclick = saveI;
+      //   })       
+  
+      // async function saveValueSomewhere(editorValue) {
+    // app.jsにeditorValueを届ける
+    
+    // return 3;
+    //.then(res => res.json())はapp.jsに含めたので消しました
+  
+
+    // 画面に結果を表示する (DOM)
+    // _________ = result;
+
+//     function showjudge(judgeresult){
+//       const data = judgeresult.results[0];
+//       judged.textContent = data;
+//     }
+
+//     window.addEventListener('DOMContentLoaded',  function () {
+//     document.querySelector("input[name=result]")  =showjudge;
+// })

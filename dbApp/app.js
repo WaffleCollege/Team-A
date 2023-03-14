@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const pg = require("pg");
 const path = require("path");
 const PORT = 3000;
-
+require("dotenv").config({ debug: true });
 
 // POSTで、req.bodyでJSON受け取りを可能に
 app.use(express.json());
@@ -218,90 +218,96 @@ app.post('/login', (req, res) => {
 app.get('/write',(req,res)=>{
   res.render('write.ejs');
 })
-//let editorValue;
-
 
 //judge0へpost
-const bodyParser = require('body-parser');
-const fetch = require('node-fetch');
-app.use(bodyParser.json());
+app.get("/judge", async (req, res) => {
+   const bodyParser = require('body-parser');
+   const fetch = require('node-fetch');
+   app.use(bodyParser.json());
+
+   const code = req.query.editorValue;
+   const url1 = 'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&fields=*'; 
+   const data1 = {
+      source_code: btoa(code),
+      language_id: 52,
+      number_of_runs: "1",
+      stdin: btoa("Judge0"),
+      expected_output: btoa(null),
+      cpu_time_limit: "2",
+      cpu_extra_time: "0.5",
+      wall_time_limit: "5",
+      memory_limit: "128000",
+      stack_limit: "64000",
+      max_processes_and_or_threads: "60",
+      enable_per_process_and_thread_time_limit: false,
+      enable_per_process_and_thread_memory_limit: false,
+      max_file_size: "1024",
+    };
+    console.log(data1)
+    
+    const options1 = {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'Content-Type': 'application/json',
+        'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40',
+        'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+      },
+      body:JSON.stringify(data1) 
+    };
+
+    fetch(url1, options1)
+    //   .then(res => res.json())
+      .then(result =>  {
+        console.log(result);
+        return {resulttoken :result};
+        // resulttoken = json(result);
+      })
+      .catch(err => console.error('error:' + err));
+
+//次はトークンをjudge0へ送る
+console.log(resulttoken);
+
+const url2 = `https://judge0-ce.p.rapidapi.com/submissions/${resulttoken}?base64_encoded=true&fields=*`
+const options2 = {
+  method: 'GET',
+  headers: {
+    'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40',
+    'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+  }
+};
+
+fetch(url2, options2)
+	.then(res => res.json({ judgeresult : json  }))
+	.then(json => 
+    console.log(json))
+	.catch(err => console.error('error:' + err));
+});
+  
+
+
+//サーバー立ち上げ
+app.listen(PORT, function(err) {
+  if (err) console.log(err);
+  console.log("Start Server!");
+});
 
 // app.get("/execute", async (req, res) => {
 //   // judge0 APIを呼び出す
 //   //  => 受け取ったコード(editorValue)を入れる
 //   //まずトークンを呼ぶpost
 //   function tokengiven(){
-//   const code = req.query.editorValue;
-//   const url1 = 'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&fields=*';
-//   const data1 = {
-//     source_code: btoa(code),
-//     language_id: 52,
-//     number_of_runs: "1",
-//     stdin: btoa("Judge0"),
-//     expected_output: btoa(null),
-//     cpu_time_limit: "2",
-//     cpu_extra_time: "0.5",
-//     wall_time_limit: "5",
-//     memory_limit: "128000",
-//     stack_limit: "64000",
-//     max_processes_and_or_threads: "60",
-//     enable_per_process_and_thread_time_limit: false,
-//     enable_per_process_and_thread_memory_limit: false,
-//     max_file_size: "1024",
-//   };
-//   console.log(data1)
+ 
   
-//   const options1 = {
-//     method: 'POST',
-//     headers: {
-//       'content-type': 'application/json',
-//       'Content-Type': 'application/json',
-//       'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40',
-//       'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
-//     },
-//     body:JSON.stringify(data1) 
-//   };
-//   var resulttoken;
-//   console/log()
-//   fetch(url1, options1)
-//   //   .then(res => res.json())
-//     .then(result =>  {
-//       console.log(result);
-//       return resulttoken = result;
-//       // resulttoken = json(result);
-//     })
-//     .catch(err => console.error('error:' + err));
-     
-// }
+
+
 
  
-//次はトークンをjudge0へ送る
-// function answergiven(){
 
-// const url2 = `https://judge0-ce.p.rapidapi.com/submissions/${resulttoken}?base64_encoded=true&fields=*`
-// const options2 = {
-//   method: 'GET',
-//   headers: {
-//     'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40',
-//     'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
-//   }
-// };
-// fetch(url2, options2)
-// 	.then(res => res.json())
-// 	.then(json => {
-//     console.log(json);
-//     return { judgeresult : json };
-//   })
-// 	.catch(err => console.error('error:' + err));
-// }
-// });
   //"judge0を呼びだした結果" 
   // ボールをwrite.ejsに返す ; 
 
-app.listen(PORT, function(err) {
-    if (err) console.log(err);
-    console.log("Start Server!");
-});
+
  
 
 
