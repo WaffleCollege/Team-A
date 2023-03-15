@@ -187,7 +187,7 @@ app.get("/question", (req, res, next) => {
         })
 })}})}); 
 
-//問題を選ぶquestion.ejs(これどうやって問題選ぶのか。とりあえずボタンを実装したけど、、）
+//問題を選ぶquestion.ejs(これどうやって問題選ぼう。とりあえずボタンを実装したけど、、）
 var q;
 app.post('/select',(req, res, next) => {
   qid = req.body.id;
