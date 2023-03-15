@@ -13,14 +13,16 @@
       <!-- これはなんだ -->
       <script defer src="../static/ahowComments.js"></script>
 
-    
+      <!-- editer.js -->
+      <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+      <link rel="stylesheet" href="../public/code.css">
 
     </head>
 
 
 
     <body>
-    
+
 
        <nav class="navbar navbar-expand-lg navbar-light bg-light ">
           <!-- ブランドロゴ -->
@@ -67,46 +69,111 @@
           <input type = "text" placeholder="言語入力欄">
        </div>
 
+
        <!-- レスポンシブのグリッド："container" "row" "col"は消さないでください！ -->
        <div class="container">
 
         <div class="row">
+
           <div class="col">
+
+            <div class ="container mt-3">
               <h2>コード入力</h2>
-              <!-- jadge0 -->
-              <div>
-                 <iframe  class= "frame_center" src="https://widgets.judge0.com/" width="600" height="900"></iframe>
-              </div>
-           </div>
+              <!-- コード記入欄 -->
+              <form action="/create" method="post" class="commentForm">
 
-
-            <div class="col" >
-              <h2>音声出力</h2>
-
-              <!-- 音声出力部分 -->
-               <main>
-                 <div id="result-div"></div>
-              </main>
-
-              <!-- ボタン部分：以下3つのclass消さないでください！ -->
-              <div class="mainBotton">
-                 <button id="start-btn"  class="start">start</button>
-                 <button id="stop-btn"class="stop">stop</button>
+                <div id="editor" class="memo-space" id=""></div>
+            
+                <!-- りつ：div class名を"form-group"から下記に変更 -->
+                <div class="d-grid gap-2">
+                  <input type="submit" value="送信"  class="btn btn-secondary" id = "save">
                 </div>
-                
+            
+              </form>
+            
             </div>
+
+          </div>
+
+          <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+          <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+          <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script>
+          <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
+          <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script>
+           
+          <script>
+            // editer.js
+             const editor1 = new EditorJS({
+           
+              holder: 'editor',
+              tools: {
+               header: {
+              class: Header, 
+              inlineToolbar: ['link'] 
+            }, 
+           
+                list: { 
+                       class: List, 
+                       inlineToolbar: true 
+                     } ,       
+                    checklist: Checklist,
+                    quote: Quote,       
+               }
+             });
+           
+            //  書き込みボタンの動き
+             const save1 = document.getElementById('save');
+           
+             save.addEventListener('click', () => {
+            
+             editor.save().then((outputData) => {
+              console.log('Article data: ', outputData)
+             }).catch((error) => {
+              console.log('Saving failed: ', error)
+             });
+            });
+
+            // ボタンを押した時書いた文章を保存する（JSONになってるとか何とか、）
+            const save2 = document.getElementById('save');
+
+            save.addEventListener('click', () => {         
+             editor.save()
+                      .then((savedData) => {
+
+                       console.log(savedData);
+
+                      });
+            });
+          </script>
+
+
+
+          <div class="col" >
+            <h2>音声出力</h2>
+
+            <!-- 音声出力部分 -->
+            <main>
+              <div id="result-div"></div>
+            </main>
+
+            <!-- ボタン部分：以下3つのclass消さないでください！ -->
+            <div class="mainBotton">
+               <button id="start-btn"  class="start">start</button>
+               <button id="stop-btn"class="stop">stop</button>
+            </div>
+                
+          </div>
         
         </div>
 
-      </div>
-
+    
+       <div class ="sample"> 
       <div class ="container mt-3">
         <h2>コメント</h2>
 
+        <!-- コメント記入欄 -->
         <form action="/create" method="post" class="commentForm">
-          <div class="form-group">
-            <textarea type="text" name="question"  rows ="10" id="nameInput" class="form-control"></textarea>
-          </div>
+          <div id="editor" class="memo-space2" width=""></div>
 
 
           <!-- りつ：div class名を"form-group"から下記に変更 -->
@@ -115,8 +182,59 @@
           </div>
 
         </form>
-
+      
       </div>
+      <script>
+        // editer.js
+        editor2 = new EditorJS({
+            
+           holder: 'editor',
+           tools: {
+            header: {
+           class: Header, 
+           inlineToolbar: ['link'] 
+         }, 
+        
+             list: { 
+                    class: List, 
+                    inlineToolbar: true 
+                  } ,       
+                 checklist: Checklist,
+                 quote: Quote,       
+            }
+          });
+
+        //  書き込みボタンの動き
+          const save3 = document.getElementById('save');
+        
+          save.addEventListener('click', () => {
+         
+          editor.save().then((outputData) => {
+           console.log('Article data: ', outputData)
+          }).catch((error) => {
+           console.log('Saving failed: ', error)
+          });
+         });
+
+         // ボタンを押した時書いた文章を保存する（JSONになってるとか何とか、）
+         const save4 = document.getElementById('save');
+
+           save.addEventListener('click', () => {         
+             editor.save()
+             .then((savedData) => {
+
+           console.log(savedData);
+
+          });
+});
+ 
+ 
+       </script> 
+ 
+    </div>
+
+
+
 
 
 <!-- ここまでが画面共有できた版 -->
@@ -148,15 +266,28 @@
 
  
     <div class="col">
+
+      <div class ="container mt-3">
         <h2>コード入力</h2>
-        <!-- jadge0 -->
-        <div>
-           <iframe  class= "frame_center" src="https://widgets.judge0.com/" width="600" height="900"></iframe>
-        </div>
-     </div>
+      
+       
+        <form action="/create" method="post" class="commentForm">
 
+           <!-- コード記入欄 -->
+          <div id="editor" class="memo-space"></div>
+      
+      
+          <!-- りつ：div class名を"form-group"から下記に変更 -->
+          <div class="d-grid gap-2">
+            <input type="submit" value="送信"  class="btn btn-secondary">
+          </div>
+      
+        </form>
+      
+      
+   <div class="col" >
 
-      <div class="col" >
+     <div class ="container mt-3">
         <h2>音声出力</h2>
 
         <!-- 音声出力部分 -->
@@ -171,7 +302,8 @@
           </div>
           
       </div>
-  
+   </div> 
+  </div>
   
 
 </div>
@@ -179,10 +311,10 @@
 <div class ="container mt-3">
   <h2>コメント</h2>
 
+  
   <form action="/create" method="post" class="commentForm">
-    <div class="form-group">
-      <textarea type="text" name="question"  rows ="10" id="nameInput" class="form-control"></textarea>
-    </div>
+    <!-- コメント記入欄 -->
+    <div id="editor" class="memo-space"></div>
 
 
     <!-- りつ：div class名を"form-group"から下記に変更 -->
@@ -193,15 +325,6 @@
   </form>
 
 </div>
-
-
-
-
-
-
-
-
-
 
 
 
@@ -242,9 +365,11 @@
         }
     </script>
 
-     
-       
-  
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script>
 
   </body>
 </html>
