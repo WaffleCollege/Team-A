@@ -101,6 +101,13 @@
     margin:0;padding:0
 }
 
+.container
+
+.commentForm > .form-group > .form-control{
+  border:1px solid  rgb(200, 200, 200) ;
+  border-radius: 30px;
+}
+
 /* ブランド*/
 .navbar > .container-fluid > .navbar-brand{
     color: rgb(2, 70, 200);
@@ -140,11 +147,23 @@ ul{
   padding-right: 32px;
 }
 
+.memo-space{
+  border-radius: 20px;
+  height: 200px;
+  border:1px solid  rgb(200, 200, 200) ;
+  padding-left: 32px;
+  padding-right: 25px;
+}
+
+.memo-space2{
+  border-radius: 20px;
+  height: 200px;
+  border:1px solid  rgb(200, 200, 200) ;
+  padding-left: 32px;
+  padding-right: 25px;
+}
 
 
  /* 画面共有できなかった版 */
  /* これ画面共有版にもかかってる。意外といいかもだからどっちかに決まったら入れるか判断 */
- .col{
-  text-align: center;
- }
- 
+
