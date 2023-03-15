@@ -551,3 +551,26 @@ async function pushButton() {
 
                 <input type="submit" value="編集" class="btn btn-primary">編集</input>
             <input type="submit" value="削除" class="btn btn-primary">削除</input>
+
+
+            <ul class="table-body">
+      <% postsRow.forEach((item1) => { %>
+        <li>
+          <div class="table">
+            <% if(item3.user_id === item1.user_id){%>
+            <div class="username"><%= item3.username %></div>
+            <% }else{%>
+              ;
+              <%} %>
+            <% if(item1.contents_id === item2.contents_id){ %>
+            <div class="question"><%= item2.question %></div>
+            <% }else{ %>
+              ;
+              <%} %>
+            <div class="post_code"><%= item1.post_code %></div>
+            <div class="post_sound"><%= item1.post_transcription %></div>
+          </div>
+        </li>
+      <% }) %>
+
+    </ul>

@@ -15,7 +15,7 @@ app.use(
     extended: true
   })
 );
-app.set('views', __dirname + '/views')
+
 
 // テンプレートエンジンの設定
 app.set("view engine", "ejs");
@@ -188,7 +188,7 @@ app.get("/question", (req, res, next) => {
 })}})}); 
 
 //問題を選ぶquestion.ejs(これどうやって問題選ぼう。とりあえずボタンを実装したけど、、）
-var q;
+var qid;
 app.post('/select',(req, res, next) => {
   qid = req.body.id;
   next();
