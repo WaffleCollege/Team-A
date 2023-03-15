@@ -6,6 +6,9 @@
     font-family: 'BIZ UDPGothic', sans-serif;
 } 
 
+
+
+
 /* ブランド*/
 .navbar > .container-fluid > .navbar-brand{
    color: rgb(2, 70, 200);
@@ -39,7 +42,17 @@
     margin-bottom: 30px;
 }
 
-h3{
-   
+/* 改善：トライのボタン位置と色*/
+
+.container mt-5 > .row > .col-sm-4 > .d-grid gap-2 >input {
+  background-color: beige;
+}
+
+h3{ 
     color: rgb(100, 100, 100);
+}
+
+table{
+   border: 2px solid black;
+   border-radius: 15px;
 }
