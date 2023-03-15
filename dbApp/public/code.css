@@ -87,7 +87,13 @@
     text-align: center;
   }
 
- 
+  .d-grid > .btn{
+    background-color: rgb(255, 223, 153);
+    font-family: 'BIZ UDPGothic', sans-serif;
+    color: rgb(80, 80, 80);
+    border: 2px solid rgb(255, 174, 0);
+    margin-top: 30px;
+ }
  
   /* タイムライン画面全体 */
 .container-fluid{
@@ -108,5 +114,37 @@
  h2{
     font-family: 'BIZ UDPGothic', sans-serif;
  
+ }
+
+
+/* 問題文〜ボタンまでのクラス部分 */
+.table-body > li{
+  margin-top: 30px;
+  padding-top: 16px;
+  border: 2px solid rgb(222, 222, 222);
+  border-radius: 15px;
+ 
+}
+
+
+.question, .input1, .output1{
+  font-family: 'BIZ UDPGothic', sans-serif;
+  color: rgb(80, 80, 80);
+  font-size: 16px;
+  text-align: center;
+  
+}
+
+/* ここら辺怪しい */
+ul{
+  padding-right: 32px;
+}
+
+
+
+ /* 画面共有できなかった版 */
+ /* これ画面共有版にもかかってる。意外といいかもだからどっちかに決まったら入れるか判断 */
+ .col{
+  text-align: center;
  }
  

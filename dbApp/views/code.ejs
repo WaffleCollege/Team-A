@@ -45,9 +45,22 @@
        </nav>
 
 
-      <!-- 空白部分 -->
+      <!-- 空白部分：消さないでください！-->
        <div class="p-4 bg-white">
        </div>
+
+        <!-- 問題部分 -->
+        <ul class="table-body">
+
+           <li style="list-style: none;">
+              <div class="table">
+                <div class="question" name="？？？">問題文</div>
+              </div>
+            </li>
+
+         </ul>
+
+
 
        <!-- 言語記入部分 -->
        <div class="language" name="language">
@@ -86,6 +99,110 @@
         </div>
 
       </div>
+
+      <div class ="container mt-3">
+        <h2>コメント</h2>
+
+        <form action="/create" method="post" class="commentForm">
+          <div class="form-group">
+            <textarea type="text" name="question"  rows ="10" id="nameInput" class="form-control"></textarea>
+          </div>
+
+
+          <!-- りつ：div class名を"form-group"から下記に変更 -->
+          <div class="d-grid gap-2">
+            <input type="submit" value="送信"  class="btn btn-secondary">
+          </div>
+
+        </form>
+
+      </div>
+
+
+<!-- ここまでが画面共有できた版 -->
+
+
+<!-- ここからが画面共有できなかった版 -->
+<h1>ここからした画面共有できなかった版</h1>
+<!-- 空白部分：消さないでください！-->
+<div class="p-4 bg-white">
+</div>
+
+<!-- 問題部分 -->
+<ul class="table-body">
+
+  <li style="list-style: none;">
+     <div class="table">
+       <div class="question" name="？？？">問題文</div>
+     </div>
+   </li>
+
+</ul>
+
+
+<div class="language" name="language">
+  <input type = "text" placeholder="言語入力欄">
+</div>
+
+<div class="container">
+
+ 
+    <div class="col">
+        <h2>コード入力</h2>
+        <!-- jadge0 -->
+        <div>
+           <iframe  class= "frame_center" src="https://widgets.judge0.com/" width="600" height="900"></iframe>
+        </div>
+     </div>
+
+
+      <div class="col" >
+        <h2>音声出力</h2>
+
+        <!-- 音声出力部分 -->
+         <main>
+           <div id="result-div"></div>
+        </main>
+
+        <!-- ボタン部分：以下3つのclass消さないでください！ -->
+        <div class="mainBotton">
+           <button id="start-btn"  class="start">start</button>
+           <button id="stop-btn"class="stop">stop</button>
+          </div>
+          
+      </div>
+  
+  
+
+</div>
+
+<div class ="container mt-3">
+  <h2>コメント</h2>
+
+  <form action="/create" method="post" class="commentForm">
+    <div class="form-group">
+      <textarea type="text" name="question"  rows ="10" id="nameInput" class="form-control"></textarea>
+    </div>
+
+
+    <!-- りつ：div class名を"form-group"から下記に変更 -->
+    <div class="d-grid gap-2">
+      <input type="submit" value="送信"  class="btn btn-secondary">
+    </div>
+
+  </form>
+
+</div>
+
+
+
+
+
+
+
+
+
+
 
 
      <!-- 音声出力JS -->
