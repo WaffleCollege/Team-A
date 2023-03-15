@@ -43,8 +43,8 @@
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
               <div class="navbar-nav ms-auto">
                    <a class="nav-link active" aria-current="page" href="index.html">Home</a>
-                   <a class="nav-link" href="index.html">問題画面</a>
-                   <a class="nav-link" href="../タイムライン/タイムライン.html">タイムライン</a>
+                   <a class="nav-link" href="/question">問題画面</a>
+                   <a class="nav-link" href="/show">タイムライン</a>
                </div>
            </diV>
 
@@ -72,10 +72,24 @@
 <div class="container mt-5">
   <div class="row">
 <!-- 灰色の四角いやつ（head内に記載あり）：特に意味ないので消しても大丈夫 -->
-      <div class="col-sm-4">
+     
+<div class="col-sm-4">
+  <ul> 
+    <form acntion="/select" method="GET"></form>
+    <button type='submit', name = "question">     
+    <% questionsResult.forEach((item) => { %>
+          <li>
            <div class="fakeimg"></div>
+       <div class="id" name="id" >
+        <%= item.question_id %>   
       </div>
-
+       <div class="question" name="question"><%= item.question %></div>
+      </button>
+  </li>
+</form>
+<% }) %>
+</ul>
+</div>
       <div class="col-sm-4">
             <div class="fakeimg"></div>
       </div>
