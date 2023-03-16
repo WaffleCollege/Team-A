@@ -16,6 +16,7 @@ app.use(
   })
 );
 
+
 // テンプレートエンジンの設定
 app.set("view engine", "ejs");
 
@@ -24,54 +25,15 @@ app.use("/static", express.static(path.join(__dirname, "public")));
 
 // DBに接続
 var pool = new pg.Pool({
-  database: "plactice",
+  database: "postgres",
   user: "postgres", //ユーザー名はデフォルト以外を利用した人は適宜変更すること
   password: "spark1000", //PASSWORDにはPostgreSQLをインストールした際に設定したパスワードを記述。
   host: "localhost",
   port: 5432
 });
 
-//解答一覧を表示する
-app.get("/show", (req, res, next) => {
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query( "select question, input1, output1 from contents_table;",
-      (error, results)=>{
-        res.render("show.ejs",  
-        { resultsRow:results.rows}
-          )   
-})}})});
 
-app.get('/new',(req,res)=>{
-  res.render('new.ejs');
-})
-
-
-//解答を書き込む
-app.post("/create", (req, res, next) => {
-  console.log(req.body);
-    var query = {
-    text: "insert into contents_table (question, input1, output1) values($1, $2, $3)",
-    values: [req.body.question, req.body.input1, req.body.output1]
-  };
-
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client
-        .query(query)
-        .then(() => {
-          res.redirect("/show");
-        })
-        .catch(e => {
-          console.error(e.stack);
-        });
-  }})});
-
-//user認証の準備
+//user認証の準備OK
 app.use(
   session({
     secret: 'my_secret_key',
@@ -91,7 +53,7 @@ app.use((req, res, next) => {
   next();
 });
 
-//登録
+//登録sign.ejsOK
 app.get('/signup', (req, res) => {
   res.render('signup.ejs', { errors: [] });
 });
@@ -123,7 +85,7 @@ app.post('/signup',
     const email = req.body.email;
     const errors = [];
     var query = {
-    text:  'select username, email, password from user_table where email = $1',
+    text:  'select username, email, password from appusers where email = $1',
     values: [req.body.email]
   };
 
@@ -150,7 +112,7 @@ app.post('/signup',
         bcrypt.hash(password, 10, (error, hash) => {
           console.log(username, email, hash);
           var query = {
-            text:  'insert into user_table (username, email, password) values ($1,$2,$3)',
+            text:  'insert into appusers (username, email, password) values ($1,$2,$3)',
             values:  [username, email, hash]
           };
           pool.connect((err, client) => {
@@ -171,7 +133,7 @@ app.post('/signup',
               }})})},
               );
 
-//ログイン
+//ログインlogin.ejsOK
 app.get('/login', (req, res) => {
   res.render('login.ejs');
 });           
@@ -184,7 +146,7 @@ app.post('/login', (req, res) => {
       res.render('login.ejs', { error: 'ログインに失敗しました' });
     } else {
       client.query(
-        'SELECT * FROM user_table WHERE email = $1',
+        'SELECT * FROM appusers WHERE email = $1',
         [email],
         (error, results) => {
           if (results.rows.length > 0) {
@@ -211,76 +173,114 @@ app.post('/login', (req, res) => {
   });
 });
 
-//monaco editor
-app.get('/write',(req,res)=>{
-  res.render('write.ejs');
+//問題一覧を表示するquestion.ejs(Error: Failed to lookup view "questions.ejs" in views directory "C:\Users\myora\Desktop\waffle\Nanaon\Team-A\dbApp/views")
+app.get("/question", (req, res, next) => {
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query( 'select  question_id, question  from contents',
+      (error, results)=>{
+        console.log(results);
+        res.render("questions.ejs",{
+        questionsResult:results.rows,
+        })
+})}})}); 
+
+//問題を選ぶquestion.ejs(これどうやって問題選ぼう。とりあえずボタンを実装したけど、、）
+var qid;
+app.post('/select',(req, res, next) => {
+  qid = req.body.id;
+  next();
+});
+
+//コードの横に出る問題とかcode.ejs（接続きれる。上から続いてるqidがあかんぽい）
+app.get("/code", (req, res, next) => {
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query( 'select  question ,firstinput, firstoutput, secondinput, secondoutput from contents where id = $1',
+      [qid],
+      (error, results)=>{
+        console.log(results);
+        res.render("code.ejs",{
+        questionsResult:results.rows[qid-1],
+        })
+})}})}); 
+
+//終了時に投稿するcode.ejs（これもqid関係か、接続が切れる）
+app.post("/stop",(req,res)=>{
+  console.log(req.body);
+    var query = {
+    text: "insert into appusers_questions (question_id, postuser_id, transcription, movieurl) values($1, $2, $3, $4)",
+    values: [qid, req.session.id, req.body.transcription, req.body.movieurl]
+  };
+
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client
+        .query(query)
+        .then(() => {
+          res.redirect("/show");
+        })
+        .catch(e => {
+          console.error(e.stack);
+        });
+  }})});
+
+
+//投稿一覧を表示するshow.ejs（結合要るので後に。もちろんエラー。）
+app.get("/show", (req, res, next) => {
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query( "select question_id, postuser_id, transcription, movieurl from appusers_questions;",
+      (error, results)=>{
+        console.log(results);
+        res.render("show.ejs",{
+        postsResult:results.rows,
+        })
+})}})});
+
+//コメント画面に飛ぶ
+app.get('/new',(req,res)=>{
+  res.render('new.ejs');
 })
 
-//judge0へpost
-app.get("/judge", async (req, res) => {
-   const bodyParser = require('body-parser');
-   const fetch = require('node-fetch');
-   app.use(bodyParser.json());
+//コメントを書き込む（ここは未完）
+var p;
+app.post('/select',(req, res, next) => {
+  pid = req.body.id;//このidに宛名の投稿のnameタグが入るのでもしつくったら入れたい！
+  console.log(req.body);
+    var query = {
+    text: "insert into commenttexts (appusers_questions_id,commenter_id, comment) values($1, $2, $3)",
+    values: [pid, req.session.id, req.body.comment]
+  };
 
-   const code = req.query.editorValue;
-   const url1 = 'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&fields=*'; 
-   const data1 = {
-      source_code: btoa(code),
-      language_id: 52,
-      number_of_runs: "1",
-      stdin: btoa("Judge0"),
-      expected_output: btoa(null),
-      cpu_time_limit: "2",
-      cpu_extra_time: "0.5",
-      wall_time_limit: "5",
-      memory_limit: "128000",
-      stack_limit: "64000",
-      max_processes_and_or_threads: "60",
-      enable_per_process_and_thread_time_limit: false,
-      enable_per_process_and_thread_memory_limit: false,
-      max_file_size: "1024",
-    };
-    console.log(data1)
-    
-    const options1 = {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'Content-Type': 'application/json',
-        'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40',
-        'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
-      },
-      body:JSON.stringify(data1) 
-    };
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client
+        .query(query)
+        .then(() => {
+          res.redirect("/show");
+        })
+        .catch(e => {
+          console.error(e.stack);
+        });
+  }})});
 
-    fetch(url1, options1)
-    //   .then(res => res.json())
-      .then(result =>  {
-        console.log(result);
-        return {resulttoken :result};
-        // resulttoken = json(result);
-      })
-      .catch(err => console.error('error:' + err));
 
-//次はトークンをjudge0へ送る
-console.log(resulttoken);
-
-const url2 = `https://judge0-ce.p.rapidapi.com/submissions/${resulttoken}?base64_encoded=true&fields=*`
-const options2 = {
-  method: 'GET',
-  headers: {
-    'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40',
-    'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
-  }
-};
-
-fetch(url2, options2)
-	.then(res => res.json({ judgeresult : json  }))
-	.then(json => 
-    console.log(json))
-	.catch(err => console.error('error:' + err));
+//サーバー立ち上げ
+app.listen(PORT, function(err) {
+  if (err) console.log(err);
+  console.log("Start Server!");
 });
-  
 
 
 //サーバー立ち上げ

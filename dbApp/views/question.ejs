@@ -70,6 +70,21 @@
 
 <!-- "container mt-5" "col-sm-4"のclass消さないでください！-->
 <div class="container mt-5">
+  <ul> 
+    <form acntion="/select" method="GET"></form>
+    <button type='submit', name = "question">     
+    <% questionsResult.forEach((item) => { %>
+          <li>
+           <div class="fakeimg"></div>
+       <div class="id" name="id" >
+        <%= item.question_id %>   
+      </div>
+       <div class="question" name="question"><%= item.question %></div>
+      </button>
+  </li>
+  </form>
+  <% }) %>
+  </ul>
 
   <table class="table table-striped table-hover">
 		
