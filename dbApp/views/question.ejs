@@ -20,7 +20,24 @@
       border-radius: 20px;
       margin-right: 15px;
     }
-    </style>
+  </style>
+<!-- <script>
+  //色々頑張ったが、、字入れで
+  var question_id;
+  document.addEventListener('readystatechange', function(){
+   // completeに変化したときだけ実行
+   var mytable = document.getElementById("qtbl");
+   for (var i=0; i < mytable.rows[0].length; i++) {
+      mytable.rows[i].cells[0].onclick = clicked;
+      mytable.rows[i].cells[0].id = i + 1
+  }
+function clicked(e) {
+  question_id = e.target.id ;
+  console.log( question_id);
+}
+});     
+  //列をクリックすると発火するよ！
+</script> -->
 </head>
 
 
@@ -70,23 +87,18 @@
 
 <!-- "container mt-5" "col-sm-4"のclass消さないでください！-->
 <div class="container mt-5">
-  <ul> 
-    <form acntion="/select" method="GET"></form>
-    <button type='submit', name = "question">     
-    <% questionsResult.forEach((item) => { %>
-          <li>
+   
+    
+   
+   
+      
+          
            <div class="fakeimg"></div>
-       <div class="id" name="id" >
-        <%= item.question_id %>   
-      </div>
-       <div class="question" name="question"><%= item.question %></div>
-      </button>
-  </li>
-  </form>
-  <% }) %>
+    
+  
   </ul>
 
-  <table class="table table-striped table-hover">
+  <table class="table table-striped table-hover" id = qtbl>
 		
     <!-- テーブルの一番上の行 -->
     <thead>
@@ -99,16 +111,23 @@
    <!-- テーブルの2番目の行 -->
 		<tbody>
 			<tr>
-			  <th scope="row" class="">1</th>
-			  <td>問題文挿入</td>
+        <% questionsResult.forEach((item) => { %>
+			  <th scope="row" class="id" name="id"><%= item.question_id %></th>
+			  <td class="question" name="question"><%= item.question %></td>
+      </form>
+        <% }) %>
 			</tr>
-		</tbody>
+		
     
 	  </table>
-
+<form action = "/select" method = "post" >
+<div class="form-item"> 
+  <p><input type="text" name = "questionnum" placeholder="問題番号を入力してEnter" >
+  <input type="submit" value="送信">
+</p>
 </div>
-
-
+</form>
+</tbody>
 
 </body>
 </html>

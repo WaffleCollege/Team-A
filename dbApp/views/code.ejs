@@ -56,7 +56,16 @@
 
            <li style="list-style: none;">
               <div class="table">
-                <div class="question" name="？？？">問題文</div>
+                <div class="question" name="aaa">問題文</div>
+                
+                  <th scope="row" class="id" name="id"><%= questionsResult.question_id %></th>
+                  <td class="question" name="question"><%= questionsResult.question %></td>
+                  <td class="question" name="firstinput"><%= questionsResult.firstinput %></td>
+                  <td class="question" name="firstoutput"><%= questionsResult.firstoutput %></td>
+                  <td class="question" name="secondinput"><%= questionsResult.secondinput %></td>
+                  <td class="question" name="secondoutput"><%= questionsResult.secondoutput %></td>
+               
+             
               </div>
             </li>
 
@@ -153,13 +162,13 @@
 
             <!-- 音声出力部分 -->
             <main>
-              <div id="result-div"></div>
+              <div id="result-div" name = "transcription" ></div>
             </main>
 
             <!-- ボタン部分：以下3つのclass消さないでください！ -->
             <div class="mainBotton">
                <button id="start-btn"  class="start">start</button>
-               <button id="stop-btn"class="stop">stop</button>
+               <button id="stop-btn"class="stop" href = "/stop">stop</button>
             </div>
                 
           </div>
@@ -251,7 +260,7 @@
 
   <li style="list-style: none;">
      <div class="table">
-       <div class="question" name="？？？">問題文</div>
+       <div class="question" name="aaa">問題文</div>
      </div>
    </li>
 
@@ -292,7 +301,7 @@
 
         <!-- 音声出力部分 -->
          <main>
-           <div id="result-div"></div>
+           <div id="result-div" name = "transcription"></div>
         </main>
 
         <!-- ボタン部分：以下3つのclass消さないでください！ -->
