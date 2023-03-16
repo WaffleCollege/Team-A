@@ -96,7 +96,6 @@ function clicked(e) {
            <div class="fakeimg"></div>
     
   
-  </ul>
 
   <table class="table table-striped table-hover" id = qtbl>
 		
@@ -120,9 +119,10 @@ function clicked(e) {
 		
     
 	  </table>
-<form action = "/select" method = "post" >
+<form action = "/startpost" method = "post" >
 <div class="form-item"> 
-  <p><input type="text" name = "questionnum" placeholder="問題番号を入力してEnter" >
+  <p><input type="text" name = "questionnum" placeholder="問題番号を入力" >
+    <input type="text" name = "shareurl" placeholder="画面共有URLを入力" >
   <input type="submit" value="送信">
 </p>
 </div>

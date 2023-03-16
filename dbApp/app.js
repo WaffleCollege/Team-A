@@ -187,33 +187,31 @@ app.get("/question", (req, res, next) => {
         })
 })}})}); 
 
-let qid; 
-//問題を選ぶquestion.ejs(これどうやって問題選ぼう。とりあえずボタンを実装したけど、、もう手入力にしました。この辺で通知送りたい。
-app.post('/select',(req, res, next) => {
+let appusers_questions_id; 
+//問題を選ぶquestion.ejs(これどうやって問題選ぼう。もう手入力にしました。この辺で通知送りたい。ok
+app.post('/startpost',(req, res, next) => {
   qid = req.body.questionnum;
   // console.log(req.session.userId);
   console.log(qid);
   console.log(req.body);
     var query = {
-    text: "insert into appusers_questions (question_id, postuser_id) values($1, $2) RETURNING appusers_questions_id",
-    values: [req.body.questionnum, req.session.userId]
+    text: "insert into appusers_questions (question_id, postuser_id, muvieURL) values($1, $2) RETURNING appusers_questions_id",
+    values: [req.body.questionnum, req.session.userId, req.body.shareurl]
   };
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
     } else {
-      client
-        .query(query)
+      client.query(query)
         .then(() => {
-          res.redirect("/code",{
-            userquest_id:client.rows
-          });
+          appusers_questions_id = client;
+          console.log(client);  //appuserquestion_id image.png 
+          res.redirect("/code");
         })
         .catch(e => {
           console.error(e.stack);
         });
   }})});
-
 
 //コードの横に出る問題とかcode.ejsはok (まだjudge0がない？？）
 app.get("/code", (req, res, next) => {
@@ -232,12 +230,12 @@ app.get("/code", (req, res, next) => {
 })}})
 }); 
 
-//終了時に投稿するcode.ejs ok? （やってみたい。userquest_idに一工夫いるかも）
-app.post("/stop",(req,res)=>{
+//終了時に投稿するcode.ejs ok? 
+app.post("/stoppost",(req,res)=>{
   console.log(req.body);
     var query = {
-    text: "insert into appusers_questions (transcription, movieurl) values($1, $2) where id = userquest_id",
-    values: [req.body.transcription, req.body.movieurl]
+    text: "insert into appusers_questions (transcription, codes) values($1, $2) where id = appusers_questions_id",
+    values: [req.body.transcription, req.body.codes]
   };
 
   pool.connect((err, client) => {
@@ -254,20 +252,8 @@ app.post("/stop",(req,res)=>{
         });
   }})});
 
-
 //投稿一覧を表示するshow.ejs
 app.get("/show", (req, res, next) => {
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query( "select question_id, postuser_id, transcription, movieurl from appusers_questions where transcription is not null  ORDER BY appusers_questions_id DESC",
-      (error, results)=>{
-        console.log(results);
-        res.render("show.ejs",{
-        postsResult:results.rows,
-        })
-})}})
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
@@ -276,10 +262,20 @@ app.get("/show", (req, res, next) => {
       (error, results)=>{
       console.log(results);
       res.render("show.ejs",{
-      LivepostsResult:results.rows,
+      LivepostsResult:results.rows
       })
 })}})
-
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query( "select question_id, postuser_id, transcription, codes from appusers_questions where transcription is not null  ORDER BY appusers_questions_id DESC",
+      (error, results)=>{
+        console.log(results);
+        res.render("show.ejs",{
+        FinishedpostsResult:results.rows
+        })
+})}})
 });
 
 //コメント画面に飛ぶ
@@ -287,14 +283,14 @@ app.get('/new',(req,res)=>{
   res.render('new.ejs');
 })
 
-//コメントを書き込む（ここは未完）
+//投稿を選んでコメントを書き込む（ここは未完）
 let comment;
 app.post('/comment',(req, res, next) => {
   comment = req.body.comment;//このidに宛名の投稿のnameタグが入るのでもしつくったら入れたい！
   console.log(req.body);
     var query = {
     text: "insert into commenttexts (appusers_questions_id,commenter_id, comment) values($1, $2, $3)",
-    values: [userquest_id, req.session.id, comment]
+    values: [appusers_questions_id, req.session.id, req.body.comment]
   };
   pool.connect((err, client) => {
     if (err) {
@@ -309,7 +305,6 @@ app.post('/comment',(req, res, next) => {
           console.error(e.stack);
         });
   }})});
-
 
 //サーバー立ち上げ
 app.listen(PORT, function(err) {
