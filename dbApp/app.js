@@ -173,7 +173,7 @@ app.post('/login', (req, res) => {
   });
 });
 
-//問題一覧を表示するquestion.ejs(Error: Failed to lookup view "questions.ejs" in views directory "C:\Users\myora\Desktop\waffle\Nanaon\Team-A\dbApp/views")
+//問題一覧を表示するquestion.ejsok
 app.get("/question", (req, res, next) => {
   pool.connect((err, client) => {
     if (err) {
