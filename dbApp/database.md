@@ -413,3 +413,164 @@ function save() {
 //     window.addEventListener('DOMContentLoaded',  function () {
 //     document.querySelector("input[name=result]")  =showjudge;
 // })
+
+//judge0へpost
+app.get("/judge", async (req, res) => {
+   const bodyParser = require('body-parser');
+   const fetch = require('node-fetch');
+   app.use(bodyParser.json());
+
+   const code = req.query.editorValue;
+   const url1 = 'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&fields=*'; 
+   const data1 = {
+      source_code: btoa(code),
+      language_id: 52,
+      number_of_runs: "1",
+      stdin: btoa("Judge0"),
+      expected_output: btoa(null),
+      cpu_time_limit: "2",
+      cpu_extra_time: "0.5",
+      wall_time_limit: "5",
+      memory_limit: "128000",
+      stack_limit: "64000",
+      max_processes_and_or_threads: "60",
+      enable_per_process_and_thread_time_limit: false,
+      enable_per_process_and_thread_memory_limit: false,
+      max_file_size: "1024",
+    };
+    console.log(data1)
+    
+    const options1 = {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'Content-Type': 'application/json',
+        'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40',
+        'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+      },
+      body:JSON.stringify(data1) 
+    };
+
+    fetch(url1, options1)
+    //   .then(res => res.json())
+      .then(result =>  {
+        console.log(result);
+        return {resulttoken :result};
+        // resulttoken = json(result);
+      })
+      .catch(err => console.error('error:' + err));
+
+//次はトークンをjudge0へ送る
+console.log(resulttoken);
+
+const url2 = `https://judge0-ce.p.rapidapi.com/submissions/${resulttoken}?base64_encoded=true&fields=*`
+const options2 = {
+  method: 'GET',
+  headers: {
+    'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40',
+    'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+  }
+};
+
+fetch(url2, options2)
+	.then(res => res.json({ judgeresult : json  }))
+	.then(json => 
+    console.log(json))
+	.catch(err => console.error('error:' + err));
+});
+
+//monaco editor
+app.get('/write',(req,res)=>{
+  res.render('write.ejs');
+})
+
+ <!-- Create the text form element -->
+<!-- まりもさん -->
+      <!-- <form action="search" method="GET" id="code-form" class="code-form"> 
+        <label for="editor">Code:</label>
+        <div id="editor" name = "editor" style="height: 300px;"></div>
+        <br>
+        <div>
+          <button type="submit" id="button" class="search-button">
+            <div id="text-button" onclick="pushButton()">
+              <img src="https://i.ibb.co/SN1SDhM/typing-fast-typing.gif" />
+            </div>
+          </button>
+        </div>
+        </form>  -->
+
+
+  <title>Monaco Editor - Text Form Example</title>
+    <!-- Load the Monaco Editor library -->
+
+    <script src="https://unpkg.com/monaco-editor@0.27.0/min/vs/loader.js"></script>
+    <script>
+      // ここに実行後のコードを入れる
+      
+      // Monaco Editorに組み込まれたJavaScriptファイルおよびモジュールを組み込むRequireを利用する
+      // Monaco Editor scriptsより先にここがコールされる必要がある
+      // Monaco Editor
+      require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@0.27.0/min/vs' } });
+      // Load the Monaco Editor scripts
+      require(['vs/editor/editor.main'], function() {
+        const editorElement = document.getElementById('editor');
+          window.editor = monaco.editor.create(editorElement, {
+          value: '',
+          language: 'javascript'
+        })
+      });
+
+      const judgeForm = document.getElementById("judge-form");
+      const result = document.getElementById("result");
+      const body = document.getElementsByTagName("body")[0];
+
+function displayResults(x) {
+  result.innerHTML = "";
+  console.log("ここは動いてる？");
+  create(x);
+}
+async function pushButton() {
+  const Value = window.editor.getValue();
+  console.log(Value);
+  editorValue =  Value;
+  const data = await fetch(
+    `http://localhost:3000/judge/${editorValue}`
+  ).then(res => res.json());
+
+  console.log("サーバーからレスポンス返ってきたよ");
+  const ele = data["judgeresult"];
+  displayResults(ele);
+  return data;
+}
+
+
+         <h3>結果</h3>
+    <div id="result" class = "judged">
+    </div>
+
+
+                <input type="submit" value="編集" class="btn btn-primary">編集</input>
+            <input type="submit" value="削除" class="btn btn-primary">削除</input>
+
+
+            <ul class="table-body">
+      <% postsRow.forEach((item1) => { %>
+        <li>
+          <div class="table">
+            <% if(item3.user_id === item1.user_id){%>
+            <div class="username"><%= item3.username %></div>
+            <% }else{%>
+              ;
+              <%} %>
+            <% if(item1.contents_id === item2.contents_id){ %>
+            <div class="question"><%= item2.question %></div>
+            <% }else{ %>
+              ;
+              <%} %>
+            <div class="post_code"><%= item1.post_code %></div>
+            <div class="post_sound"><%= item1.post_transcription %></div>
+          </div>
+        </li>
+      <% }) %>
+
+    </ul>

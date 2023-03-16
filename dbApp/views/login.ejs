@@ -13,12 +13,29 @@
         <div class="panel">
           <h2>ログイン</h2>
           <form action="/login" method="post">
-            <p>メールアドレス</p>
-            <input type="text" name="email">
-            <p>パスワード</p>
-            <input type="password" name="password">
-            <input type="submit" value="ログイン">
-            <a href="/list">一覧にもどる</a>
+            <!-- Username -->
+            <div class="form-item">
+              <input type="text" name="username" placeholder="ユーザーネーム">
+            </div>
+            
+            <!-- Email -->
+             <div class="form-item"> 
+                 <input type="text" name = "email" placeholder="メールアドレス" >
+             </div>
+
+             <!-- password -->
+             <div class="form-item"> 
+                 <input type="password" name="password" placeholder="パスワード">
+              </div>
+
+
+
+              <div class="button-panel">
+                <input type="submit" class="button" value="ログイン"></input>
+              </div>
+            
+          
+          
           </form>
         </div>
       </div>

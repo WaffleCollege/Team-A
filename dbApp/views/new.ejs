@@ -8,26 +8,50 @@
     <script defer src="../static/index.js"></script>
   </head>
   <body>
-    <div class="board">
-    <h1>ノート</h1>
 
-    <h2>記録する</h2>
+    <nav class="navbar bg-light">
+      <!-- ブランドロゴ -->
+     <div class="container-fluid">
+        <span class="navbar-brand" href="ここ入れる" >PRODUCTNAME</span>
+   
+         <!-- アイコン部分（入ってないけど） -->
+         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon"></span>
+         </button>
+      
+         <!--ハンバーガーメニュー  改善：右の四角もう少し大きく-->
+         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+           <div class="navbar-nav ms-auto">
+             <a class="nav-link active" aria-current="page" href="../問題/index.html">Home</a>
+             <a class="nav-link" href="../問題/index.html">問題画面</a>
+             <a class="nav-link" href="タイムライン.html">タイムライン</a>
+           </div>
+         </diV>
+       </div>
+    </nav>
+    
+  
+    <div class="p-5 bg-white text-white text-center">
+    </div>
 
-    <form action="/create" method="post" class="commentForm">
-      <div class="form-group">
-        <label for="question">問題（仮）</label>
-        <input type="text" name="question"  id="nameInput" class="form-control">
-      </div>
-      <div class="form-group">
-        <label for="commentInput">インプット（仮）</label>
-        <textarea type="text" name="input1" id="commentInput" class="form-control"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="commentInput">アウトプット（仮）</label>
-        <textarea type="text" name="output1" id="commentInput" class="form-control"></textarea>
-      </div>
-      <div class="form-group">
-        <input type="submit" value="保存" class="btn btn-primary">
+      <!-- りつ：div class="board" 消した-->
+      <!-- りつ：class入れた -->
+      <div class ="container mt-3">
+        <h2>コメント</h2>
+
+        <form action="/create" method="post" class="commentForm">
+          <div class="form-group">
+            <textarea type="text" name="question"  rows ="10" id="nameInput" class="form-control"></textarea>
+          </div>
+
+
+          <!-- りつ：div class名を"form-group"から下記に変更 -->
+          <div class="d-grid gap-2">
+            <input type="submit" value="書き込む" class="btn btn-primary">
+          </div>
+
+        </form>
+
       </div>
     </form>
 
