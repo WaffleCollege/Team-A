@@ -173,7 +173,7 @@ app.post('/login', (req, res) => {
   });
 });
 
-//問題一覧を表示するquestion.ejs(Error: Failed to lookup view "questions.ejs" in views directory "C:\Users\myora\Desktop\waffle\Nanaon\Team-A\dbApp/views")
+//問題一覧を表示するquestion.ejsok
 app.get("/question", (req, res, next) => {
   pool.connect((err, client) => {
     if (err) {
@@ -182,39 +182,60 @@ app.get("/question", (req, res, next) => {
       client.query( 'select  question_id, question  from contents',
       (error, results)=>{
         console.log(results);
-        res.render("questions.ejs",{
+        res.render("question.ejs",{
         questionsResult:results.rows,
         })
 })}})}); 
 
-//問題を選ぶquestion.ejs(これどうやって問題選ぼう。とりあえずボタンを実装したけど、、）
-var qid;
-app.post('/select',(req, res, next) => {
-  qid = req.body.id;
-  next();
-});
-
-//コードの横に出る問題とかcode.ejs（接続きれる。上から続いてるqidがあかんぽい）
-app.get("/code", (req, res, next) => {
+let appusers_questions_id; 
+//問題を選ぶquestion.ejs(これどうやって問題選ぼう。もう手入力にしました。この辺で通知送りたい。ok
+app.post('/startpost',(req, res, next) => {
+  qid = req.body.questionnum;
+  // console.log(req.session.userId);
+  console.log(qid);
+  console.log(req.body);
+    var query = {
+    text: "insert into appusers_questions (question_id, postuser_id, muvieURL) values($1, $2) RETURNING appusers_questions_id",
+    values: [req.body.questionnum, req.session.userId, req.body.shareurl]
+  };
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
     } else {
-      client.query( 'select  question ,firstinput, firstoutput, secondinput, secondoutput from contents where id = $1',
+      client.query(query)
+        .then(() => {
+          appusers_questions_id = client;
+          console.log(client);  //appuserquestion_id image.png 
+          res.redirect("/code");
+        })
+        .catch(e => {
+          console.error(e.stack);
+        });
+  }})});
+
+//コードの横に出る問題とかcode.ejsはok (まだjudge0がない？？）
+app.get("/code", (req, res, next) => {
+  console.log(qid);
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query( 'select  question ,firstinput, firstoutput, secondinput, secondoutput from contents where question_id = $1',
       [qid],
       (error, results)=>{
         console.log(results);
         res.render("code.ejs",{
         questionsResult:results.rows[qid-1],
         })
-})}})}); 
+})}})
+}); 
 
-//終了時に投稿するcode.ejs（これもqid関係か、接続が切れる）
-app.post("/stop",(req,res)=>{
+//終了時に投稿するcode.ejs ok? 
+app.post("/stoppost",(req,res)=>{
   console.log(req.body);
     var query = {
-    text: "insert into appusers_questions (question_id, postuser_id, transcription, movieurl) values($1, $2, $3, $4)",
-    values: [qid, req.session.id, req.body.transcription, req.body.movieurl]
+    text: "insert into appusers_questions (transcription, codes) values($1, $2) where id = appusers_questions_id",
+    values: [req.body.transcription, req.body.codes]
   };
 
   pool.connect((err, client) => {
@@ -231,36 +252,46 @@ app.post("/stop",(req,res)=>{
         });
   }})});
 
-
-//投稿一覧を表示するshow.ejs（結合要るので後に。もちろんエラー。）
+//投稿一覧を表示するshow.ejs
 app.get("/show", (req, res, next) => {
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
     } else {
-      client.query( "select question_id, postuser_id, transcription, movieurl from appusers_questions;",
+      client.query( "select question_id, postuser_id from appusers_questions where transcription is null  ORDER BY appusers_questions_id DESC",
+      (error, results)=>{
+      console.log(results);
+      res.render("show.ejs",{
+      LivepostsResult:results.rows
+      })
+})}})
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query( "select question_id, postuser_id, transcription, codes from appusers_questions where transcription is not null  ORDER BY appusers_questions_id DESC",
       (error, results)=>{
         console.log(results);
         res.render("show.ejs",{
-        postsResult:results.rows,
+        FinishedpostsResult:results.rows
         })
-})}})});
+})}})
+});
 
 //コメント画面に飛ぶ
 app.get('/new',(req,res)=>{
   res.render('new.ejs');
 })
 
-//コメントを書き込む（ここは未完）
-var p;
-app.post('/select',(req, res, next) => {
-  pid = req.body.id;//このidに宛名の投稿のnameタグが入るのでもしつくったら入れたい！
+//投稿を選んでコメントを書き込む（ここは未完）
+let comment;
+app.post('/comment',(req, res, next) => {
+  comment = req.body.comment;//このidに宛名の投稿のnameタグが入るのでもしつくったら入れたい！
   console.log(req.body);
     var query = {
     text: "insert into commenttexts (appusers_questions_id,commenter_id, comment) values($1, $2, $3)",
-    values: [pid, req.session.id, req.body.comment]
+    values: [appusers_questions_id, req.session.id, req.body.comment]
   };
-
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
@@ -275,19 +306,12 @@ app.post('/select',(req, res, next) => {
         });
   }})});
 
-
 //サーバー立ち上げ
 app.listen(PORT, function(err) {
   if (err) console.log(err);
   console.log("Start Server!");
 });
 
-
-//サーバー立ち上げ
-app.listen(PORT, function(err) {
-  if (err) console.log(err);
-  console.log("Start Server!");
-});
 
 // app.get("/execute", async (req, res) => {
 //   // judge0 APIを呼び出す

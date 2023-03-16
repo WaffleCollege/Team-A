@@ -71,14 +71,15 @@
       </ul>
 
 
-    <!-- りつ：ejs特有の書き方の部分削除して作りました！（コメアウトしてもerror出るため）自分のローカルにのこしてます！もし手元に＜%みたいなコード消えてたら？おっしゃってください！-->
+    <!-- りつ：ejs特有の書き方の部分削除して作りました！（コメアウトしてもerror出るため）自分のローカルにのこしてます！もし手元に＜%みたいなコード消えてたら？おっしゃってください！OK!-->
+    <!-- <div class="question">問題文</div> -->
     <ul class="table-body">
 
        <li style="list-style: none;">
           <div class="table">
-            <div class="question">問題文</div>
+            
             <div class="input1">コメント（イメージ違かったらここ書き換えちゃってください！）</div>
-            <div class="output1">ここ何か表示させる？（もし投稿選ぶ際にあったらいい情報あったらここにお願いします！）</div>
+            <div class="名前">ここ何か表示させる？（もし投稿選ぶ際にあったらいい情報あったらここにお願いします！）</div>
             <input type="submit" value="書き込む" class="btn btn-secondary"></input>
             <input type="submit" value="書き込み削除？（いらなかったら消してください）" class="btn btn-secondary"></input>
           </div>
@@ -95,6 +96,19 @@
         </li>
 
     </ul>
+<!-- 投稿しかみえないなら↓はいらない？ 詳細ページがいる？-->
+    <ul> 
+      <% questionsResult.forEach((item) => { %>
+        <li>       
+         <div class="id" name="id" >
+          <%= item.question_id %>   
+        </div>
+         <div class="question" name="question"><%= item.question %>
+        </div>
+    </li>
+    <% }) %>
+    </ul>
+
 
     
   </div>
