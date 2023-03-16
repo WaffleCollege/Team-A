@@ -182,7 +182,7 @@ app.get("/question", (req, res, next) => {
       client.query( 'select  question_id, question  from contents',
       (error, results)=>{
         console.log(results);
-        res.render("questions.ejs",{
+        res.render("question.ejs",{
         questionsResult:results.rows,
         })
 })}})}); 
@@ -283,11 +283,7 @@ app.listen(PORT, function(err) {
 });
 
 
-//サーバー立ち上げ
-app.listen(PORT, function(err) {
-  if (err) console.log(err);
-  console.log("Start Server!");
-});
+
 
 // app.get("/execute", async (req, res) => {
 //   // judge0 APIを呼び出す
