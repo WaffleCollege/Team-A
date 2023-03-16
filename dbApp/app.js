@@ -288,15 +288,14 @@ app.get('/new',(req,res)=>{
 })
 
 //コメントを書き込む（ここは未完）
-
-app.post('/select',(req, res, next) => {
-  pid = req.body.id;//このidに宛名の投稿のnameタグが入るのでもしつくったら入れたい！
+let comment;
+app.post('/comment',(req, res, next) => {
+  comment = req.body.comment;//このidに宛名の投稿のnameタグが入るのでもしつくったら入れたい！
   console.log(req.body);
     var query = {
     text: "insert into commenttexts (appusers_questions_id,commenter_id, comment) values($1, $2, $3)",
-    values: [pid, req.session.id, req.body.comment]
+    values: [userquest_id, req.session.id, comment]
   };
-
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
@@ -311,13 +310,12 @@ app.post('/select',(req, res, next) => {
         });
   }})});
 
+
 //サーバー立ち上げ
 app.listen(PORT, function(err) {
   if (err) console.log(err);
   console.log("Start Server!");
 });
-
-
 
 
 // app.get("/execute", async (req, res) => {
