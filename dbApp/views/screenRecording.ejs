@@ -1,4 +1,130 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Javascript MediaRecorder Project to Record Screen</title>
+</head>
+<body>
+  <!-- HTML for start and stop buttons -->
+<button id="start-button" onclick="start()">Start Recording</button>
+<script>
+// Request permission to capture the screen
+navigator.mediaDevices.getDisplayMedia({video: true}).then(stream => {
+  // Create a new MediaRecorder
+  const recorder = new MediaRecorder(stream);
+  
+  // Start recording
+  recorder.start();
+  
+  // Create an empty buffer to hold the recorded data
+  const buffer = [];
+  
+  // Listen for data available events and add the data to the buffer
+  recorder.addEventListener('dataavailable', event => {
+    buffer.push(event.data);
+  });
+  
+  // Listen for the stop event and create an MP4 file from the buffer
+  recorder.addEventListener('stop', () => {
+    const blob = new Blob(buffer, {type: 'video/mp4'});
+      // Create a download link and trigger a download
+      const a = document.createElement('a');
+      objectURL = URL.createObjectURL(blob);
+      console.log(objectURL);
+     //a.href = URL.createObjectURL(blob);
+    
+    //a.download = 'screen-recording.mp4';
+    //a.click();
+  });
+  
+  // Stop recording after 5 seconds
+  setTimeout(() => {
+    recorder.stop();
+  }, 100000);
+});
+  
+  </script>
+</body>
+</html>
+
+
+
+<!-- 画面保存上手くできなかった版 -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <video width="700" height="400" controls></video>
+  <script>
+     const start = async () => {
+      const stream = await navigator.mediaDevices.getDisplayMedia(
+        {
+          video:{
+            mediaSource:"screen",
+          },
+        });
+
+        const data=[];
+
+      const mediaRecorder = new MediaRecorder(stream);
+      
+      mediaRecorder.ondataavailable = (e) => {
+        data.push(e.data);
+      };
+
+      mediaRecorder.start
+      mediaRecorder.onstop=(e)=>{
+        document.querySelector("video").src=URL.createObjectURL(
+          new Blob(data,{
+            type:data[0].type,
+          })
+        );
+      };
+     };
+
+      
+
+         start();
+
+  </script>
+</body>
+</html> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 以下、画面共有のみのコード -->
+<!-- <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
 <meta charset="utf8"/>
@@ -37,6 +163,8 @@ $(function(){
   localVideo = document.querySelector( "video" );
   navigator.mediaDevices.getDisplayMedia( mediaStreamConstraints ).then( gotLocalMediaStream ).catch( handleLocalMediaStreamError );
 });
+
+
 </script>
 <style>
 html, body {
@@ -48,9 +176,10 @@ html, body {
 </style>
 </head>
 <body>
-  <!-- Video element (live stream) -->
+  Video element (live stream)
   <div>
     <video autoplay playsinline id="video" width="640" height="480"></video>
   </div>
+  
 </body>
-</html>
+</html>   -->
