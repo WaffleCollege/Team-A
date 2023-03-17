@@ -300,6 +300,12 @@ app.listen(PORT, function(err) {
 });
 
 
+//画面共有
+app.get('/screenRecording', (req, res) => {
+  res.render('screenRecording.ejs');
+});
+
+
 // //コードを保存する
 // app.post("/save",(req,res)=>{
 //    let code = editorvalue;
