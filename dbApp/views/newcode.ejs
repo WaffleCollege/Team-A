@@ -14,7 +14,20 @@
       <script defer src="../static/ahowComments.js"></script>
 
       <!-- editer.js -->
-      <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+      <!-- <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest">
+      const editor = new EditorJS({
+        holder: 'editor',       
+        tools: {
+            header: Header,        
+            list: List,        
+            checklist: Checklist,
+            quote: Quote,
+            code: CodeTool
+        }
+  });
+</script> -->
+  
+  
       <link rel="stylesheet" href="../public/code.css">
 
     </head>
@@ -149,7 +162,6 @@
                     <!-- ボタン部分：以下3つのclass消さないでください！ -->
                     <li style="list-style: none;">
                     <div class="mainBotton">
-                      <form action = ""></form>
                       <button id="start-btn"  class="start">start</button>
                       <button id="stop-btn"class="stop">stop</button>
                     </li>
@@ -157,7 +169,7 @@
               </div>
          
 
-   
+   <form action ="/savetext" method="post">
                <div class ="container mt-5">
                   <h2>音声出力欄</h2>
 
@@ -180,32 +192,38 @@
                <h1>復習しよう！</h1>
                </div>
 <!-- コード貼り付け欄と音声出力らん -->
+                  
+    
               <div class="container mt-4">
                 <div class="row">
                   <div class="col">
                     <h2>コード貼り付け欄</h2>
-
+                    <form id="form" action = "/save" method="post">
+                      <label for="editor">Code:</label>
+                      <div id="editor" class="memo-space2" width=""  style="height: 300px;" ></div>
+                      <br>
+                      <button type="submit" value = "実行">保存</button>
+                    </form>
                       <!-- コード貼り付け -->
                      <!-- <form action="/create" method="post" class="commentForm"> -->
-                     <div></div><input id="editor" class="memo-space2" width="" name = "codes"></div>
+                     <!-- <input id="editor" class="memo-space2" width="" name = "codes"></div> -->
 
                   </div>
 
                   <div class="col">
-                    <h2>ノート欄</h2>
-                        
-                        <div><input id="editor" class="memo-space2" width="" name = "note"> </div>
+                    <h2>ノート欄</h2>                  
+                        <div><input class="memo-space2" width="" name = "note"> </div>
                         
                    </div>
                   </div>
                  </div>
-               
+                </form>           
                    <!-- りつ：div class名を"form-group"から下記に変更 -->
-                      <div class="d-grid gap-2">
-                        <form action="/stop" method = "post">
+                      <!-- <div class="d-grid gap-2">
+                        
                         <input type="submit" value="送信"  class="btn btn-secondary">
-                      </form>
-                      </div>
+                      
+                      </div> -->
 
                     </div>
 
