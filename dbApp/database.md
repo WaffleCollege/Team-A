@@ -233,18 +233,50 @@ select * from comments;
   </head>
   <body>
     <!-- Create the text form element -->
-    <form id="form" action = "/compile" method="post">
+    <form id="form" action = "/save" method="post">
       <label for="editor">Code:</label>
       <div id="editor" style="height: 300px;"></div>
       <br>
-      <button type="submit" value = "実行">実行</button>
+      <button type="submit" value = "実行">保存</button>
     </form>
     <div>
       <h3>結果</h3>
       
-  
+  <script src="https://unpkg.com/monaco-editor@0.27.0/min/vs/loader.js"></script>
+    <script>
+      // ここに実行後のコードを入れる
+      let editorValue = '';
+
+      // JavaScriptファイルおよびモジュールを組み込むRequireJSを利用する
+      // Monaco Editor scriptsより先にコールされる必要がある
+      // Monaco Editor
+      require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@0.27.0/min/vs' } });
+      // Load the Monaco Editor scripts
+      require(['vs/editor/editor.main'], function() {
+        // Create the text form
+        const editorElement = document.getElementById('editor');
+        const editor = monaco.editor.create(editorElement, {
+          value: '',
+          language: 'python'
+        });
+        
+        const form = document.getElementById('/compile');
+        
+        form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        editorValue = editor.getValue();
+        console.log(editorValue);
+        // Submit the form data to the server as needed
+        });});
+    </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script>
       
-    </div>
+    
   </body>
 </html> -->
 

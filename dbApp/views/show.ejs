@@ -97,18 +97,51 @@
 
     </ul>
 <!-- 投稿しかみえないなら↓はいらない？ 詳細ページがいる？-->
+
+<form action="/postselect" method="post">
+
+  <!-- 横幅もうちょい狭sくs -->
+  <div class="mb-3 mt-3">
+    <p><input name = "postnum"></p>
+  </div>
+
+  <div class = "container">
+
+     <div class = "row">
+        <div class = "col">
+           <div class="d-grid gap-2" >
+            <input type="reset" value="消す" class="btn btn-secondary">
+           </div>
+        </div>
+
+        <div class ="col">
+           <div class="d-grid gap-2" >
+             <input type="submit" class="btn btn-primary" value="送る">
+           </div>
+        </div>  
+     </div>
+
+  </div>
+</form>
+
+
     <ul> 
-      <% questionsResult.forEach((item) => { %>
+      <% LivepostsResult.forEach((item) => { %>
         <li>       
          <div class="id" name="id" >
-          <%= item.question_id %>   
+          <%= item.appusers_questions_id %>   
         </div>
-         <div class="question" name="question"><%= item.question %>
+         <div class="question" name="question"><%= item.question_id %>
+        </div>
+        <div class="question" name="question"><%= item.question %>
+        </div>
+        <div class="question" name="question"><%= item.username %>
+        </div>
+        <div class="question" name="question"><%= item.shareurl %>
         </div>
     </li>
     <% }) %>
     </ul>
-
 
     
   </div>

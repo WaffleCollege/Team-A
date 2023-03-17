@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "new.js",
-  
   "scripts": {
     "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -24,6 +23,7 @@
     "express-openid-connect": "^2.12.0",
     "express-session": "^1.17.3",
     "fetch": "^1.1.0",
+    "firebase": "^9.18.0",
     "jsonwebtoken": "^9.0.0",
     "monaco-editor": "^0.33.0",
     "passport": "^0.6.0",
@@ -33,7 +33,6 @@
     "pg-promise": "^11.0.2",
     "sequelize": "^6.29.1",
     "type": "module"
-    
   },
   "devDependencies": {
     "nodemon": "^2.0.16"
