@@ -159,7 +159,7 @@ app.post('/login', (req, res) => {
               if (isEqual) {
                 req.session.userId = results.rows[0].id;
                 req.session.username = results.rows[0].username;
-                res.redirect('/show');
+                res.redirect('/question');
               } else {
                 res.redirect('/login');
               }
@@ -188,15 +188,15 @@ app.get("/question", (req, res, next) => {
 })}})}); 
 
 let appusers_questions_id; 
-//問題を選ぶquestion.ejs(これどうやって問題選ぼう。もう手入力にしました。この辺で通知送りたい。ok
+//問題を選ぶquestion.ejs(これどうやって問題選ぼう。もう手入力にしました。この辺で通知送りたい。 なんか1しかでない。ok , (postuser_id) req.body.shareurl
 app.post('/startpost',(req, res, next) => {
   qid = req.body.questionnum;
   // console.log(req.session.userId);
   console.log(qid);
   console.log(req.body);
     var query = {
-    text: "insert into appusers_questions (question_id, postuser_id, muvieURL) values($1, $2) RETURNING appusers_questions_id",
-    values: [req.body.questionnum, req.session.userId, req.body.shareurl]
+    text: "insert into appusers_questions (question_id, postuser_id, movieurl) values($1, $2, $3) RETURNING appusers_questions_id",
+    values: [req.body.questionnum,  req.session.userId, req.body.shareurl]
   };
   pool.connect((err, client) => {
     if (err) {
@@ -206,7 +206,7 @@ app.post('/startpost',(req, res, next) => {
         .then(() => {
           appusers_questions_id = client;
           console.log(client);  //appuserquestion_id image.png 
-          res.redirect("/code");
+          res.redirect("/newcode");
         })
         .catch(e => {
           console.error(e.stack);
@@ -214,7 +214,7 @@ app.post('/startpost',(req, res, next) => {
   }})});
 
 //コードの横に出る問題とかcode.ejsはok (まだjudge0がない？？）
-app.get("/code", (req, res, next) => {
+app.get("/newcode", (req, res, next) => {
   console.log(qid);
   pool.connect((err, client) => {
     if (err) {
@@ -224,18 +224,18 @@ app.get("/code", (req, res, next) => {
       [qid],
       (error, results)=>{
         console.log(results);
-        res.render("code.ejs",{
+        res.render("newcode.ejs",{
         questionsResult:results.rows[qid-1],
         })
 })}})
 }); 
 
 //終了時に投稿するcode.ejs ok? 
-app.post("/stoppost",(req,res)=>{
+app.post("/stop",(req,res)=>{
   console.log(req.body);
     var query = {
-    text: "insert into appusers_questions (transcription, codes) values($1, $2) where id = appusers_questions_id",
-    values: [req.body.transcription, req.body.codes]
+    text: "insert into appusers_questions (transcription, codes, note) values($1, $2, $3) where id = $4",
+    values: [req.body.transcription, req.body.codes, req.body.note, appusers_questions_id ]
   };
 
   pool.connect((err, client) => {
@@ -253,58 +253,58 @@ app.post("/stoppost",(req,res)=>{
   }})});
 
 //投稿一覧を表示するshow.ejs
-app.get("/show", (req, res, next) => {
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query( "select question_id, postuser_id from appusers_questions where transcription is null  ORDER BY appusers_questions_id DESC",
-      (error, results)=>{
-      console.log(results);
-      res.render("show.ejs",{
-      LivepostsResult:results.rows
-      })
-})}})
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query( "select question_id, postuser_id, transcription, codes from appusers_questions where transcription is not null  ORDER BY appusers_questions_id DESC",
-      (error, results)=>{
-        console.log(results);
-        res.render("show.ejs",{
-        FinishedpostsResult:results.rows
-        })
-})}})
-});
+// app.get("/show", (req, res, next) => {
+//   pool.connect((err, client) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       client.query( "select question_id, postuser_id, shareurl from appusers_questions where transcription is null  ORDER BY appusers_questions_id DESC",
+//       (error, results)=>{
+//       console.log(results);
+//       res.render("show.ejs",{
+//       LivepostsResult:results.rows
+//       })
+// })}})
+//   pool.connect((err, client) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       client.query( "select question_id, postuser_id, transcription, codes from appusers_questions where transcription is not null  ORDER BY appusers_questions_id DESC",
+//       (error, results)=>{
+//         console.log(results);
+//         res.render("show.ejs",{
+//         FinishedpostsResult:results.rows
+//         })
+// })}})
+// });
 
-//コメント画面に飛ぶ
-app.get('/new',(req,res)=>{
-  res.render('new.ejs');
-})
+// //コメント画面に飛ぶ
+// app.get('/new',(req,res)=>{
+//   res.render('new.ejs');
+// })
 
-//投稿を選んでコメントを書き込む（ここは未完）
-let comment;
-app.post('/comment',(req, res, next) => {
-  comment = req.body.comment;//このidに宛名の投稿のnameタグが入るのでもしつくったら入れたい！
-  console.log(req.body);
-    var query = {
-    text: "insert into commenttexts (appusers_questions_id,commenter_id, comment) values($1, $2, $3)",
-    values: [appusers_questions_id, req.session.id, req.body.comment]
-  };
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client
-        .query(query)
-        .then(() => {
-          res.redirect("/show");
-        })
-        .catch(e => {
-          console.error(e.stack);
-        });
-  }})});
+// //投稿を選んでコメントを書き込
+// let comment;
+// app.post('/comment',(req, res, next) => {
+//   comment = req.body.comment;//このidに宛名の投稿のnameタグが入るのでもしつくったら入れたい！
+//   console.log(req.body);
+//     var query = {
+//     text: "insert into commenttexts (appusers_questions_id,commenter_id, codecomment, comment) values($1, $2, $3)",
+//     values: [appusers_questions_id, req.session.id, req.body.codecomment, req.body.comment]
+//   };
+//   pool.connect((err, client) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       client
+//         .query(query)
+//         .then(() => {
+//           res.redirect("/show");
+//         })
+//         .catch(e => {
+//           console.error(e.stack);
+//         });
+//   }})});
 
 //サーバー立ち上げ
 app.listen(PORT, function(err) {

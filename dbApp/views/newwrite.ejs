@@ -27,7 +27,7 @@
           <!-- ブランドロゴ -->
           <div class="container-fluid">
              <span class="navbar-brand mb-0 h1" href="../問題/index.html" >PRODUCTNAME</span>
-       
+             <p><%= locals.username %>さん</p>
                <!-- アイコン部分 -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
@@ -54,7 +54,7 @@
         <ul class="table-body">
            <li style="list-style: none;">
               <div class="table">
-                <div class="question" name="？？？">問題文</div>
+                <div class="question" name="kk">問題文</div>
               </div>
             </li>
          </ul>
@@ -72,7 +72,7 @@
                <div class ="container mt-3">
                   <h2>コメント</h2>
                   <form action="/create" method="post" class="commentForm">
-                      <div id="editor" class="memo-space" id=""></div>
+                      <div id="editor" class="memo-space" name = "comment"></div>
                    </form>
                 </div>
 
@@ -81,7 +81,7 @@
                   <div class ="container mt-3">
                     <h2>コード出力欄</h2>
                     <form action="/create" method="post" class="commentForm">
-                      <div id="editor" class="memo-space" id=""></div>                 
+                      <div id="editor" class="memo-space" name = "codecomment"></div>                 
                     </form> 
                   </div>
                 </div>

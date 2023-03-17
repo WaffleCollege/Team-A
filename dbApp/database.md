@@ -413,3 +413,5 @@ function save() {
 //     window.addEventListener('DOMContentLoaded',  function () {
 //     document.querySelector("input[name=result]")  =showjudge;
 // })
+
+                <div class="question" name="ll"> <p  scope="row" class="id" name="id"><%= questionsResult.question_id %></p>

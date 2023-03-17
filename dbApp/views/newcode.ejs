@@ -28,7 +28,7 @@
           <!-- ブランドロゴ -->
           <div class="container-fluid">
              <span class="navbar-brand mb-0 h1" href="question.ejs" >PRODUCTNAME</span>
-       
+             <p><%= locals.username %>さん</p>
                <!-- アイコン部分 -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
@@ -53,16 +53,14 @@
 
         <!-- 問題部分 -->
         <ul class="table-body">
-
-           <li style="list-style: none;">
+         <li style="list-style: none;">
               <div class="table">
-                <div class="question" name="？？？">問題文</div>
+
+                  <div class="question" name="question"><%= questionsResult.question %></div>
               </div>
             </li>
 
          </ul>
-
-
 
        <!-- 言語記入部分 -->
        <div class="language" name="language">
@@ -96,6 +94,10 @@
           <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script>
           <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script>
               
+          <td class="question" name="firstinput"></td>
+          <td class="question" name="firstoutput"></td>
+          <td class="question" name="secondinput"></td>
+          <td class="question" name="secondoutput"></td>
 
             <!-- 入出力部分 -->
       
@@ -105,7 +107,7 @@
                   <h2>入力例</h2>
                   <li style="list-style: none;">
                      <div class="table">
-                       <div class="question" name="？？？">入力例</div>
+                       <div class="question" name="mm"><%= questionsResult.firstinput %></div>
                      </div>
                    </li>
        
@@ -115,10 +117,30 @@
                   <h2>出力例</h2>
                   <li style="list-style: none;">
                      <div class="table">
-                       <div class="question" name="？？？">出力例</div>
+                       <div class="question" name="mm"><%= questionsResult.firstoutput %></div>
                      </div>
                    </li>
                 </ul>
+                <div class="col" >
+                
+                  <ul class="table-body">
+                    <h2>入力例</h2>
+                    <li style="list-style: none;">
+                       <div class="table">
+                         <div class="question" name="mm"><%= questionsResult.secondinput %></div>
+                       </div>
+                     </li>
+         
+                  </ul>
+               
+                  <ul class="table-body">
+                    <h2>出力例</h2>
+                    <li style="list-style: none;">
+                       <div class="table">
+                         <div class="question" name="mm"><%= questionsResult.secondoutput %></div>
+                       </div>
+                     </li>
+                  </ul>
                 
                  <!-- 改善：ボタンの位置はならかすのと大きく -->
                    <ul class="table-body-botton">
@@ -127,6 +149,7 @@
                     <!-- ボタン部分：以下3つのclass消さないでください！ -->
                     <li style="list-style: none;">
                     <div class="mainBotton">
+                      <form action = ""></form>
                       <button id="start-btn"  class="start">start</button>
                       <button id="stop-btn"class="stop">stop</button>
                     </li>
@@ -140,7 +163,7 @@
 
                    <!-- 音声出力部分 -->
                     <main>
-                       <div id="result-div"></div>
+                       <div id="result-div" name = "transcription"></div>
                     </main>
 
                     <!-- ボタン部分：以下3つのclass消さないでください！ -->
@@ -163,15 +186,15 @@
                     <h2>コード貼り付け欄</h2>
 
                       <!-- コード貼り付け -->
-                     <form action="/create" method="post" class="commentForm">
-                     <div id="editor" class="memo-space2" width=""></div>
+                     <!-- <form action="/create" method="post" class="commentForm"> -->
+                     <div></div><input id="editor" class="memo-space2" width="" name = "codes"></div>
 
                   </div>
 
                   <div class="col">
-                    <h2>音声出力欄</h2>
-                        <form action="/create" method="post" class="commentForm">
-                        <div id="editor" class="memo-space2" width=""></div>
+                    <h2>ノート欄</h2>
+                        
+                        <div><input id="editor" class="memo-space2" width="" name = "note"> </div>
                         
                    </div>
                   </div>
@@ -179,7 +202,9 @@
                
                    <!-- りつ：div class名を"form-group"から下記に変更 -->
                       <div class="d-grid gap-2">
+                        <form action="/stop" method = "post">
                         <input type="submit" value="送信"  class="btn btn-secondary">
+                      </form>
                       </div>
 
                     </div>
