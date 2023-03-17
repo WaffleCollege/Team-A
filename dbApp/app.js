@@ -195,8 +195,8 @@ app.post('/startpost',(req, res, next) => {
   console.log(qid);
   console.log(req.body);
     var query = {
-    text: "insert into appusers_questions (question_id, postuser_id, movieurl) values($1, $2, $3) RETURNING appusers_questions_id",
-    values: [req.body.questionnum,  req.session.userId, req.body.shareurl]
+    text: "insert into appusers_questions (question_id, username, movieurl) values($1, $2, $3) RETURNING appusers_questions_id",
+    values: [req.body.questionnum,  req.session.username, req.body.shareurl]
   };
   pool.connect((err, client) => {
     if (err) {
@@ -213,7 +213,7 @@ app.post('/startpost',(req, res, next) => {
         });
   }})});
 
-//コードの横に出る問題とかcode.ejsはok (まだjudge0がない？？）
+//コードの横に出る問題
 app.get("/newcode", (req, res, next) => {
   console.log(qid);
   pool.connect((err, client) => {
@@ -230,27 +230,122 @@ app.get("/newcode", (req, res, next) => {
 })}})
 }); 
 
-//終了時に投稿するcode.ejs ok? 
-app.post("/stop",(req,res)=>{
-  console.log(req.body);
-    var query = {
-    text: "insert into appusers_questions (transcription, codes, note) values($1, $2, $3) where id = $4",
-    values: [req.body.transcription, req.body.codes, req.body.note, appusers_questions_id ]
-  };
-
+//投稿を並べる
+// select a.appusers_questions_id, a.question_id, a.username, a.movieurl, b.question, b.question_id from appusers_questions a left join questions b on a.question_id = b.question_id order by appusers_questions_id DESC;
+// let postusername ;
+app.get("/show", (req, res, next) => {
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
     } else {
+      client.query( "select a.appusers_questions_id, a.question_id, a.username, a.movieurl, b.question, b.question_id from appusers_questions a left join contents b on a.question_id = b.question_id order by appusers_questions_id DESC",
+      (error, results)=>{
+      console.log(results);
+
+      // postusername = results.rows.username;
+      // postquestion = results.rows.question;
+      res.render("show.ejs",{
+      LivepostsResult:results.rows
+      })
+})}})
+});
+
+//投稿を選ぶ
+app.post("/postselect", (req,res)=>{
+  console.log(req.body);
+    var query = {
+    text : 'insert into commentstofrom (fromid, postid) values ($1) ',
+    values : [req.session.id, req.body.postnum]
+  };
+  pool.connect((err, client) => {
+    if (err) {
+    } else {
       client
         .query(query)
         .then(() => {
-          res.redirect("/show");
+          res.redirect("/comment",{
+          });
         })
         .catch(e => {
           console.error(e.stack);
         });
   }})});
+
+//コメントをする
+app.post("/comment",(req,res)=>{
+  // req.body.transcription
+  console.log(req.body);
+    var query = {
+    text : 'insert into commentstofrom (fromname, comment) values ($1, $2) ',
+    values : [req.session.name, comment]
+  };
+  pool.connect((err, client) => {
+    if (err) {
+    } else {
+      client
+        .query(query)
+        .then(() => {
+          res.redirect("/comment");
+        })
+        .catch(e => {
+          console.error(e.stack);
+        });
+  }})});
+
+
+//サーバー立ち上げ
+app.listen(PORT, function(err) {
+  if (err) console.log(err);
+  console.log("Start Server!");
+});
+
+
+// //コードを保存する
+// app.post("/save",(req,res)=>{
+//    let code = editorvalue;
+//    console.log(req.body);
+//    var query = {
+//    text : 'insert into appusers_questions (codes) values ($1) where id = $2',
+//    values : [editorvalue, appusers_questions_id]
+//  };
+//  pool.connect((err, client) => {
+//    if (err) {
+//      console.log(err);
+//    } else {
+//      client
+//        .query(query)
+//        .then(() => {
+//          res.redirect("/question");
+//        })
+//        .catch(e => {
+//          console.error(e.stack);
+//        });
+//  }})});
+
+
+//音声とノートを終了時に投稿する 
+// app.post("/savetext",(req,res)=>{
+//   // req.body.transcription
+//   console.log(req.body);
+//     var query = {
+//     text : 'insert into appusers_questions (transcription, codes, note) values ($1, $2) where id = $4',
+//     values : [req.body.transcription, req.body.note, appusers_questions_id]
+//   };
+//   pool.connect((err, client) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       client
+//         .query(query)
+//         .then(() => {
+//           res.redirect("/show");
+//         })
+//         .catch(e => {
+//           console.error(e.stack);
+//         });
+//   }})});
+
+
 
 //投稿一覧を表示するshow.ejs
 // app.get("/show", (req, res, next) => {
@@ -306,11 +401,7 @@ app.post("/stop",(req,res)=>{
 //         });
 //   }})});
 
-//サーバー立ち上げ
-app.listen(PORT, function(err) {
-  if (err) console.log(err);
-  console.log("Start Server!");
-});
+
 
 
 // app.get("/execute", async (req, res) => {
