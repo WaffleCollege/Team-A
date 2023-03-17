@@ -86,3 +86,19 @@
     margin-top: 10px;
 }
 
+.question > ul{
+    text-align: center;
+    list-style-type:none;
+}
+
+.question >li{
+    list-style-type:none;
+    border: 2px solid rgb(197, 193, 193);
+    border-radius: 15px;
+}
+
+.question{
+    border: 2px solid rgb(197, 193, 193);
+    border-radius: 15px;
+    margin-top: 40px;
+}
