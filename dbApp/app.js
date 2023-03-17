@@ -188,6 +188,7 @@ app.get("/question", (req, res, next) => {
 })}})}); 
 
 let appusers_questions_id; 
+let qid;
 //問題を選ぶquestion.ejs(これどうやって問題選ぼう。もう手入力にしました。この辺で通知送りたい。 なんか1しかでない。ok , (postuser_id) req.body.shareurl
 app.post('/startpost',(req, res, next) => {
   qid = req.body.questionnum;
@@ -196,7 +197,7 @@ app.post('/startpost',(req, res, next) => {
   console.log(req.body);
     var query = {
     text: "insert into appusers_questions (question_id, username, movieurl) values($1, $2, $3) RETURNING appusers_questions_id",
-    values: [req.body.questionnum,  req.session.username, req.body.shareurl]
+    values: [qid,  locals.username, req.body.shareurl]
   };
   pool.connect((err, client) => {
     if (err) {
@@ -211,7 +212,41 @@ app.post('/startpost',(req, res, next) => {
         .catch(e => {
           console.error(e.stack);
         });
-  }})});
+  }})
+  var query = {
+    text: "insert into up (username,question_id) values($1, $2)",
+    values: [locals.username, req.body.questionnum]
+  };
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query(query)
+        .then(() => {  //appuserquestion_id image.png 
+          res.redirect("/newcode");
+        })
+        .catch(e => {
+          console.error(e.stack);
+        });
+  }})
+  //INSERT INTO テーブル1(N1, N2, N3) SELECT C1, C2, C3 FROM テーブル2 WHERE 条件式;
+  var query = {
+    text: "insert into up (question) select (question) from contents question_id = question_id",
+    values: [ ]
+  };
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query(query)
+        .then(() => {  //appuserquestion_id image.png 
+          res.redirect("/newcode");
+        })
+        .catch(e => {
+          console.error(e.stack);
+        });
+  }})
+});
 
 //コードの横に出る問題
 app.get("/newcode", (req, res, next) => {
@@ -238,7 +273,7 @@ app.get("/show", (req, res, next) => {
     if (err) {
       console.log(err);
     } else {
-      client.query( "select a.appusers_questions_id, a.question_id, a.username, a.movieurl, b.question, b.question_id from appusers_questions a left join contents b on a.question_id = b.question_id order by appusers_questions_id DESC",
+      client.query( "select a.appusers_questions_id, a.question_id, a.username, a.movieurl, b.question, b.question_id from appusers_questions a left join contents b on a.question_id = b.question_id order by appusers_questions_id DESC ;",
       (error, results)=>{
       console.log(results);
 
@@ -247,15 +282,23 @@ app.get("/show", (req, res, next) => {
       res.render("show.ejs",{
       LivepostsResult:results.rows
       })
-})}})
-});
+})}})});
+// pool.connect((err, client) => {
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     client.query( "INSERT INTO pq SELECT postname, question , postuserid SELECT  FROM appusers_questions WHERE 条件式;",
+//     (error, results)=>{
+//     console.log(results);
+// });
 
-//投稿を選ぶ
+//（INSERT）投稿を見る画面においてユーザーBが入力した投稿番号という変数req.body.postnumをコメントデータベースに保存する。
+//②（SELECT）ユーザーコンテンツデータベースから問題文と投稿者の名前を、（INSERT）コメントデータベースへ、（Where）投稿番号が同じものに絞って保存する。
 app.post("/postselect", (req,res)=>{
   console.log(req.body);
     var query = {
-    text : 'insert into commentstofrom (fromid, postid) values ($1) ',
-    values : [req.session.id, req.body.postnum]
+    text : 'insert into commentfromto (postid) values ($1) ',
+    values : [req.body.postnum]
   };
   pool.connect((err, client) => {
     if (err) {
@@ -269,11 +312,44 @@ app.post("/postselect", (req,res)=>{
         .catch(e => {
           console.error(e.stack);
         });
-  }})});
+  }})
+  var query = {
+    text : 'insert into commentfromto select  postuser_id from appusers_questions ',
+    values : [req.body.postnum]
+  };
+  pool.connect((err, client) => {
+    if (err) {
+    } else {
+      client
+        .query(query)
+        .then(() => {
+          res.redirect("/comment",{
+          });
+        })
+        .catch(e => {
+          console.error(e.stack);
+        });
+  }})
+});
+
+
+app.post("/commented",(req,res)=>{
+  // req.body.transcription
+  //選んだ投稿の宛名と問題文が見れる
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query( "select a.username, b.question from appusers_questions a left join contents b on a.appusers_questions_id = $1;",
+      [],
+      (error, results)=>{
+      console.log(results);
+      // postusername = results.rows.username;
+      // postquestion = results.rows.question;
+      res.render("chat.ejs" )
+    })}})
 
 //コメントをする
-app.post("/comment",(req,res)=>{
-  // req.body.transcription
   console.log(req.body);
     var query = {
     text : 'insert into commentstofrom (fromname, comment) values ($1, $2) ',
