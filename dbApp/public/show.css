@@ -1,24 +1,30 @@
-/* タイムライン画面全体 */
+/* ブランドの色とフォントサイズ変わらん */
+
+
+/* タイトルとハンバーガーメニュー全体にかかる */
 .container-fluid{
     font-family: 'BIZ UDPGothic', sans-serif;
-}
+} 
+
+
+
 
 /* ブランド*/
 .navbar > .container-fluid > .navbar-brand{
-    color: rgb(2, 70, 200);
-    font-size: 24px;
- }
- /* ハンバーガーメニューのリンク真ん中に/ 問題：リンクの色を薄くしたいが反映されない */
- .nav-link{
-     text-align: center; 
- }
- 
- /* ハンバーグバーのリンクの色指定できない？？ */
- /* .navbar > .container-fluid > .nav-link{
-     color:rgb(2, 70, 200);
- } */
- 
- /* ナブバーの部分 */
+   color: rgb(2, 70, 200);
+   font-size: 24px;
+}
+/* ハンバーガーメニューのリンク真ん中に/ 問題：リンクの色を薄くしたいが反映されない */
+.nav-link{
+    text-align: center; 
+}
+
+/* ナビばーのリンクの色指定できない？？ */
+/* .navbar > .container-fluid > .nav-link{
+    color:rgb(2, 70, 200);
+} */
+
+/* ナブバーの部分 */
 .nav-tabs > .nav-item > .nav-link{
     font-family: 'BIZ UDPGothic', sans-serif;
     font-size: 20px;
@@ -29,60 +35,45 @@
     font-size: 20px;
     color: rgb(246, 170, 0);
 }
- 
 
-/* タイム>問題画面のみ */
-.col-sm-4 {
-    padding-bottom: 50px;
+
+/* 問題のイメージ部分 */
+.col-sm-4{
+    margin-bottom: 30px;
 }
 
+/* 改善：トライのボタン位置と色*/
 
-/* 改善：ボタンを押すと全部消えるのなおす */
-.d-grid > .btn{
-   background-color: rgb(255, 223, 153);
-   font-family: 'BIZ UDPGothic', sans-serif;
-   color: rgb(80, 80, 80);
-   border: 2px solid rgb(255, 174, 0);
-   margin-top: 30px;
+.container mt-5 > .row > .col-sm-4 > .d-grid gap-2 >input {
+  background-color: beige;
 }
 
-.col-sm-4 > h2{
-    font-family: 'BIZ UDPGothic', sans-serif;
-    color: rgb(80, 80, 80);
+h3{ 
+    color: rgb(100, 100, 100);
 }
 
-/* タイムラインの要素部分 */
-.table-body{
+table{
+   border: 2px solid black;
+   border-radius: 15px;
+}
+
+.form-item {
     text-align: center;
-    padding-right: 32px;
 }
 
-.table{
-    margin: 16px;
+.question > ul{
+    text-align: center;
+    list-style-type:none;
 }
 
-/* 問題文〜ボタンまでのクラス部分 */
-.table-body > li{
-    margin-top: 30px;
-    border: 2px solid rgb(222, 222, 222);
+.question >li{
+    list-style-type:none;
+    border: 2px solid rgb(197, 193, 193);
     border-radius: 15px;
-   
 }
 
-/* 文字 */
-.question, .input1, .output1{
-   font-family: 'BIZ UDPGothic', sans-serif;
-   color: rgb(80, 80, 80);
-   font-size: 16px;
-   
+.question{
+    border: 2px solid rgb(197, 193, 193);
+    border-radius: 15px;
+    margin-top: 40px;
 }
-
-.table > input{
-    font-family: 'BIZ UDPGothic', sans-serif;
-    font-size: 13px;
-    color: rgb(110, 110, 110);
-    background-color:rgb(255, 174, 0) ;
-    border: 0px;
-    margin-top: 10px;
-}
-
