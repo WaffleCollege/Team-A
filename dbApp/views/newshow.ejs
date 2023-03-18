@@ -87,8 +87,10 @@
                       <% LivepostsResult.forEach((item) => { %>
                         <tr>
                           <!-- <th scope="col">新着順？</th> -->
-                           <th scope="col"><%= item.question_id %></th>
-                           <td scope="col"><%= item.shareurl %></td>
+                          <th scope="col"><%= item.a.username %></th>
+                          <td scope="col"><%= item.a.movieurl %></td>
+                           <th scope="col"><%= item.a.question_id %></th>
+                           <td scope="col"><%= item.b.question %></td>                      
                          </tr>
                      <% }) %>
                        <tr>
