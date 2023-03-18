@@ -85,17 +85,16 @@
     <table class="table table-striped table-hover" id = qtbl>
       
       <!-- テーブルの一番上の行 -->
-      
+  
   
      <!-- テーブルの2番目の行 -->
-      <tbody>
-        <div class = "question">
-          LivepostsResult.forEach((item) => {
-            
-          })
-          
+     <div class = "question">
+        <% LivepostsResult.forEach((item) => { %>
+         <% item.appusers_questions.appusers_questions_id %>
+         <% item.appusers_questions.username %>
+          <% item.contents.question %>
+          <% }) %>
       </div>
-
 
        <!-- もし上野がおかしかったらこっちを復活 -->
         <!-- <tr>

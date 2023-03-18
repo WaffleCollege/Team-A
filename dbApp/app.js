@@ -188,15 +188,16 @@ app.get("/question", (req, res, next) => {
 })}})}); 
 
 let appusers_questions_id; 
-let qid;
+let questionumber;
 //問題を選ぶquestion.ejs(これどうやって問題選ぼう。もう手入力にしました。この辺で通知送りたい。 なんか1しかでない。ok , (postuser_id) req.body.shareurl
 app.post('/startpost',(req, res, next) => {
+  console.log(req.session.username);
   // console.log(req.session.userId);
-  console.log(qid);
   console.log(req.body);
+  questionumber = Number(req.body.questionnum);
     var query = {
     text: "insert into appusers_questions (question_id, movieurl) values($1, $2) RETURNING appusers_questions_id",
-    values: [req.body.questionnum, req.body.shareurl]
+    values: [questionumber, req.body.shareurl]
   };
   pool.connect((err, client) => {
     if (err) {
@@ -204,60 +205,46 @@ app.post('/startpost',(req, res, next) => {
     } else {
       client.query(query)
         .then(() => {;  //appuserquestion_id image.png 
-          res.redirect("/newcode");
+          res.redirect("/newcode2");
         })
         .catch(e => {
           console.error(e.stack);
         });
-  }})
-  var query = {
-    text: "insert into up (username,question_id) values($1, $2)",
-    values: [req.session.username, req.body.questionnum]
-  };
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query(query)
-        .then(() => {  //appuserquestion_id image.png 
-          res.redirect("/newcode");
-        })
-        .catch(e => {
-          console.error(e.stack);
-        });
-  }})
-  //INSERT INTO テーブル1(N1, N2, N3) SELECT C1, C2, C3 FROM テーブル2 WHERE 条件式;
-  var query = {
-    text: "insert into up (question) select (question) from contents question_id = question_id",
-    values: [ ]
-  };
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query(query)
-        .then(() => {  //appuserquestion_id image.png 
-          res.redirect("/newcode");
-        })
-        .catch(e => {
-          console.error(e.stack);
-        });
-  }})
+}})
 });
+  // var query = {
+  //   text: "insert into up (username,question_id) values($1, $2)",
+  //   values: [req.session.username, req.body.questionnum]
+  // };
+  // pool.connect((err, client) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     client.query(query)
+  //       .then(() => {  //appuserquestion_id image.png 
+  //         res.redirect("/newcode");
+  //       })
+  //       .catch(e => {
+  //         console.error(e.stack);
+  //       });
+  // }})
+
 
 //コードの横に出る問題,コメント
-app.get("/newcode", (req, res, next) => {
-  console.log(qid);
+app.get("/newcode2", (req, res, next) => {
+  console.log(questionumber);
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
     } else {
       client.query( 'select  question ,firstinput, firstoutput, secondinput, secondoutput from contents where question_id = $1',
-      [qid],
+      [questionumber],
       (error, results)=>{
         console.log(results);
-        questionsResult = results.rows[qid-1];   
+        questionsResult = results.rows[questionumber-1];   
+        res.render("newcode2.ejs");
 })}})
+
 // pool.connect((err, client) => {
 //   if (err) {
 //     console.log(err);
@@ -325,7 +312,6 @@ app.post("/postselect", (req,res)=>{
   }})
 });
 
-
 app.post("/commented",(req,res)=>{
   let postuserid;
   let postquestionid;
@@ -341,9 +327,10 @@ app.post("/commented",(req,res)=>{
       postuserid = results.rows.a.postuser_id;
       postquestionid = results.rows.a.question_id;
     })}})
+        
   let postuser_name;
   let post_question;
-    pool.connect((err, client) => {
+  pool.connect((err, client) => {
       if (err) {
         console.log(err);
       } else {
@@ -368,6 +355,7 @@ app.post("/commented",(req,res)=>{
             post_question : post_question
           })
         })}})
+      
 //コメントをする
   console.log(req.body);
     var query = {
