@@ -43,8 +43,8 @@
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                    <div class="navbar-nav ms-auto">
                      <a class="nav-link active" aria-current="page" href="question.ejs">Home</a>
-                     <a class="nav-link" href="question.ejs">問題画面</a>
-                     <a class="nav-link" href="show.ejs">投稿一覧</a>
+                     <a class="nav-link" href="/question">問題画面</a>
+                     <a class="nav-link" href="/show">投稿一覧</a>
                     </div>
                  </diV>
      
@@ -62,92 +62,57 @@
        <!-- 上３分の1にある「問題画面」「タイムライン」のバー： "nav nav-tabs justify-content-center" "nav-item" "nav-link active"消さないでください！-->
        <ul class="nav nav-tabs justify-content-center">
            <li class="nav-item">
-             <a class="nav-link" aria-current="page" href="../問題/index.html"><span>問題画面</span></a>
+             <a class="nav-link" aria-current="page" href="/question"><span>問題画面</span></a>
            </li>
 
            <li class="nav-item">
-              <a class="nav-link active" href="#">タイムライン</a>
+              <a class="nav-link active" href="/show">タイムライン</a>
            </li>
       </ul>
 
+      <div class = "sticky-container">
+        <section>
+        <div class = "sticky-item">
+      <form action="/postselect" method="post">
+        <!-- 横幅もうちょい狭sくs -->
+        <div class="mb-3 mt-3">
+          <p><input name = "postnum"></p>
+        </div>
+        <div class = "container">    
+           <div class = "row">
+              <div class = "col">
+                 <div class="d-grid gap-2" >
+                  <input type="reset" value="消す" class="btn btn-secondary">
+                 </div>
+              </div>    
+              <div class ="col">
+                 <div class="d-grid gap-2" >
+                   <input type="submit" class="btn btn-primary" value="送る">
+                 </div>
+              </div>  
+           </div>     
+        </div>
+      </form>
+    </div>
+  </section>
+    </div>    
 
     <!-- りつ：ejs特有の書き方の部分削除して作りました！（コメアウトしてもerror出るため）自分のローカルにのこしてます！もし手元に＜%みたいなコード消えてたら？おっしゃってください！OK!-->
     <!-- <div class="question">問題文</div> -->
     <ul class="table-body">
-
-       <li style="list-style: none;">
-          <div class="table">
-            
-            <div class="input1">コメント（イメージ違かったらここ書き換えちゃってください！）</div>
-            <div class="名前">ここ何か表示させる？（もし投稿選ぶ際にあったらいい情報あったらここにお願いします！）</div>
-            <input type="submit" value="書き込む" class="btn btn-secondary"></input>
-            <input type="submit" value="書き込み削除？（いらなかったら消してください）" class="btn btn-secondary"></input>
-          </div>
-        </li>
-
+      <% LivepostsResult.forEach((item) => { %>
         <li style="list-style: none;">
           <div class="table">
-            <div class="question">問題文</div>
-            <div class="input1">コメント（イメージ違かったらここ書き換えちゃってください！）</div>
-            <div class="output1">ここ何か表示させる？（もし投稿選ぶ際にあったらいい情報あったらここにお願いします！）</div>
-            <input type="submit" value="書き込む" class="btn btn-secondary"></input>
-            <input type="submit" value="書き込み削除？（いらなかったら消してください）" class="btn btn-secondary"></input>
+            <div class="question"> <%= item.appusers_questions_id %> </div>
+            <div class="input1"><%= item.question_id %></div>
+            <div><%= item.question %></div>
+            <div><%= item.username %></div>
+            <div><%= item.shareurl %></div>
           </div>
         </li>
-
+        <% }) %>
     </ul>
-<!-- 投稿しかみえないなら↓はいらない？ 詳細ページがいる？-->
-
-<form action="/postselect" method="post">
-
-  <!-- 横幅もうちょい狭sくs -->
-  <div class="mb-3 mt-3">
-    <p><input name = "postnum"></p>
-  </div>
-
-  <div class = "container">
-
-     <div class = "row">
-        <div class = "col">
-           <div class="d-grid gap-2" >
-            <input type="reset" value="消す" class="btn btn-secondary">
-           </div>
-        </div>
-
-        <div class ="col">
-           <div class="d-grid gap-2" >
-             <input type="submit" class="btn btn-primary" value="送る">
-           </div>
-        </div>  
-     </div>
-
-  </div>
-</form>
-
-
-    <ul> 
-      <% LivepostsResult.forEach((item) => { %>
-        <li>       
-         <div class="id" name="id" >
-          <%= item.appusers_questions_id %>   
-        </div>
-         <div class="question" name="question"><%= item.question_id %>
-        </div>
-        <div class="question" name="question"><%= item.question %>
-        </div>
-        <div class="question" name="question"><%= item.username %>
-        </div>
-        <div class="question" name="question"><%= item.shareurl %>
-        </div>
-    </li>
-    <% }) %>
-    </ul>
-
     
   </div>
-
-
-  
-
   </body>
 </html>

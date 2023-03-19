@@ -173,6 +173,14 @@ app.post('/login', (req, res) => {
   });
 });
 
+//スタート画面
+app.get("/",(req,res)=>{
+  res.render("newstart.ejs")
+})
+app.post("/start", (req,res)=>{
+  res.render("login.ejs")
+})
+
 //問題一覧を表示するquestion.ejsok
 app.get("/question", (req, res, next) => {
   pool.connect((err, client) => {
@@ -187,47 +195,92 @@ app.get("/question", (req, res, next) => {
         })
 })}})}); 
 
+app.get("/screenRecoding", (req,res)=>{
+  res.render("screenRecoding.ejs");
+})
+
 let appusers_questions_id; 
+let questionumber;
 //問題を選ぶquestion.ejs(これどうやって問題選ぼう。もう手入力にしました。この辺で通知送りたい。 なんか1しかでない。ok , (postuser_id) req.body.shareurl
 app.post('/startpost',(req, res, next) => {
-  qid = req.body.questionnum;
+  console.log(req.session.username);
   // console.log(req.session.userId);
-  console.log(qid);
   console.log(req.body);
+  questionumber = Number(req.body.questionnum);
     var query = {
-    text: "insert into appusers_questions (question_id, username, movieurl) values($1, $2, $3) RETURNING appusers_questions_id",
-    values: [req.body.questionnum,  req.session.username, req.body.shareurl]
+    text: "insert into appusers_questions (question_id, movieurl) values($1, $2) RETURNING appusers_questions_id",
+    values: [questionumber, req.body.shareurl]
   };
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
     } else {
       client.query(query)
-        .then(() => {
-          appusers_questions_id = client;
-          console.log(client);  //appuserquestion_id image.png 
-          res.redirect("/newcode");
+        .then(() => {;  //appuserquestion_id image.png 
+          res.redirect("/newcode2");
         })
         .catch(e => {
           console.error(e.stack);
         });
-  }})});
+}})
+});
+  // var query = {
+  //   text: "insert into up (username,question_id) values($1, $2)",
+  //   values: [req.session.username, req.body.questionnum]
+  // };
+  // pool.connect((err, client) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     client.query(query)
+  //       .then(() => {  //appuserquestion_id image.png 
+  //         res.redirect("/newcode");
+  //       })
+  //       .catch(e => {
+  //         console.error(e.stack);
+  //       });
+  // }})
 
-//コードの横に出る問題
-app.get("/newcode", (req, res, next) => {
-  console.log(qid);
+
+//コードの横に出る問題,コメント
+app.get("/newcode2", (req, res, next) => {
+  console.log(questionumber);
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
     } else {
       client.query( 'select  question ,firstinput, firstoutput, secondinput, secondoutput from contents where question_id = $1',
-      [qid],
+      [questionumber],
       (error, results)=>{
         console.log(results);
-        res.render("newcode.ejs",{
-        questionsResult:results.rows[qid-1],
-        })
+        questionsResult = results.rows[questionumber-1];   
+        res.render("newcode2.ejs");
 })}})
+
+// pool.connect((err, client) => {
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     client.query( " select id from appusers where username = $1 ",
+//     [req.session.name],
+//     (error, results)=>{
+//     console.log(results);
+//     postuser_id = results.rows.id;
+//   })}})
+
+// pool.connect((err, client) => {
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     client.query( 'select fromname, comment from commentfromto where postid = postuser_id',
+//     (error, results)=>{
+//       console.log(results);
+//       commentssResult = results.rows;
+//       res.render("newcode.ejs",{
+//         questionsResult:questionsResult,
+//         commentssResult:commentssResult
+//       })
+// })}})
 }); 
 
 //投稿を並べる
@@ -238,24 +291,22 @@ app.get("/show", (req, res, next) => {
     if (err) {
       console.log(err);
     } else {
-      client.query( "select a.appusers_questions_id, a.question_id, a.username, a.movieurl, b.question, b.question_id from appusers_questions a left join contents b on a.question_id = b.question_id order by appusers_questions_id DESC",
+      client.query( "select a.appusers_questions_id, a.question_id, a.username, a.movieurl, b.question, b.question_id from appusers_questions a left join contents b on a.question_id = b.question_id order by appusers_questions_id DESC ;",
       (error, results)=>{
       console.log(results);
-
       // postusername = results.rows.username;
       // postquestion = results.rows.question;
       res.render("show.ejs",{
       LivepostsResult:results.rows
       })
-})}})
-});
+})}})});
 
-//投稿を選ぶ
+//（INSERT）投稿を見る画面においてユーザーBが入力した投稿番号という変数req.body.postnumをコメントデータベースに保存する。
 app.post("/postselect", (req,res)=>{
   console.log(req.body);
     var query = {
-    text : 'insert into commentstofrom (fromid, postid) values ($1) ',
-    values : [req.session.id, req.body.postnum]
+    text : 'insert into commentfromto (postid) values ($1) ',
+    values : [req.body.postnum]
   };
   pool.connect((err, client) => {
     if (err) {
@@ -263,21 +314,65 @@ app.post("/postselect", (req,res)=>{
       client
         .query(query)
         .then(() => {
-          res.redirect("/comment",{
-          });
+          res.render("chat.ejs");
         })
         .catch(e => {
           console.error(e.stack);
         });
-  }})});
+  }})
+});
 
+// app.get("/comment",(req,res)=>{
+//   let postuserid;
+//   let postquestionid;
+//   // req.body.transcription
+//   //選んだ投稿の宛名と問題文が見れる
+//   pool.connect((err, client) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       client.query( " SELECT a.postuser_id, a.question_id FROM appusers_questions a JOIN commentfromto c ON a.appusers_questions_id = c.postid ",
+//       (error, results)=>{
+//       console.log(results);
+//       postuserid = results.rows.a.postuser_id;
+//       postquestionid = results.rows.a.question_id;
+//     })}})
+        
+//   let postuser_name;
+//   let post_question;
+//   pool.connect((err, client) => {
+//       if (err) {
+//         console.log(err);
+//       } else {
+//         client.query( " select username from appusers where id = $1 ",
+//         [postuserid],
+//         (error, results)=>{
+//         console.log(results);
+//         postuser_name = results.rows.username;
+//       })}})
+  
+//       pool.connect((err, client) => {
+//         if (err) {
+//           console.log(err);
+//         } else {
+//           client.query( " select question from contents where question_id = $1",
+//           [postquestionid],
+//           (error, results)=>{
+//           console.log(results);
+//           post_question = results.rows.question;
+//           res.render("chat.ejs" ,{
+//             postuser_name : postuser_name,
+//             post_question : post_question
+//           })
+//         })}})
+//       }); 
 //コメントをする
-app.post("/comment",(req,res)=>{
-  // req.body.transcription
+
+app.post("/commented",(req,res)=>{
   console.log(req.body);
     var query = {
     text : 'insert into commentstofrom (fromname, comment) values ($1, $2) ',
-    values : [req.session.name, comment]
+    values : [req.session.name, req.body.comment]
   };
   pool.connect((err, client) => {
     if (err) {
@@ -291,7 +386,7 @@ app.post("/comment",(req,res)=>{
           console.error(e.stack);
         });
   }})});
-
+  
 
 //サーバー立ち上げ
 app.listen(PORT, function(err) {
