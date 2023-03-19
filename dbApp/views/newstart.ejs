@@ -45,7 +45,7 @@
       <nav class="navbar navbar-expand-lg navbar-light bg-light ">
         <!-- ブランドロゴ -->
         <div class="container-fluid">
-           <span class="navbar-brand mb-0 h1" href="../問題/index.html" >PRODUCTNAME</span>
+           <span class="navbar-brand mb-0 h1" href="../問題/index.html" >ASYNC</span>
            <p><%= locals.username %>さん</p>
             
         </div>
@@ -62,13 +62,13 @@
             <!-- 背景部分 -->
             <div class="new">
               <h2>はじめに</h2>
-              <h4><span>「jadge0 APIキー」</span>をお持ちですか？</h4>
+              <h4><span>「judge0 APIキー」</span>をお持ちですか？</h4>
               <h5>お持ちの方は、はじめるボタンをタップ！</h5>
-
+            <form action = "/start" method = "post">
               <div class="d-grid">
-                <input type="submit" value="はじめる"  class="btn btn-secondary">
+                <input type="submit" value="はじめる" name="start" class="btn btn-secondary">
               </div>
-
+            </form>
                 <h5>お持ちでない方は<a href="https://judge0.com/">こちら</a>をタップ！</h5>
                <h5>（タップ後、judge0のページに飛びます。）</h5>
           

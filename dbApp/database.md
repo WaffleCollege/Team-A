@@ -447,3 +447,12 @@ function save() {
 // })
 
                 <div class="question" name="ll"> <p  scope="row" class="id" name="id"><%= questionsResult.question_id %></p>
+
+                  <!-- <ul class="table-body">
+    <li style="list-style: none;">
+         <div class="table">
+
+             <div class="question" name="mm"><%= postuser_name  %><br><br><%= post_question %></div>
+         </div>
+       </li>
+    </ul> -->

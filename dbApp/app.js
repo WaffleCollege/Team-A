@@ -173,6 +173,14 @@ app.post('/login', (req, res) => {
   });
 });
 
+//スタート画面
+app.get("/",(req,res)=>{
+  res.render("newstart.ejs")
+})
+app.post("/start", (req,res)=>{
+  res.render("login.ejs")
+})
+
 //問題一覧を表示するquestion.ejsok
 app.get("/question", (req, res, next) => {
   pool.connect((err, client) => {
@@ -186,6 +194,10 @@ app.get("/question", (req, res, next) => {
         questionsResult:results.rows,
         })
 })}})}); 
+
+app.get("/screenRecoding", (req,res)=>{
+  res.render("screenRecoding.ejs");
+})
 
 let appusers_questions_id; 
 let questionumber;
@@ -282,7 +294,6 @@ app.get("/show", (req, res, next) => {
       client.query( "select a.appusers_questions_id, a.question_id, a.username, a.movieurl, b.question, b.question_id from appusers_questions a left join contents b on a.question_id = b.question_id order by appusers_questions_id DESC ;",
       (error, results)=>{
       console.log(results);
-
       // postusername = results.rows.username;
       // postquestion = results.rows.question;
       res.render("show.ejs",{
@@ -303,8 +314,7 @@ app.post("/postselect", (req,res)=>{
       client
         .query(query)
         .then(() => {
-          res.redirect("/comment",{
-          });
+          res.render("chat.ejs");
         })
         .catch(e => {
           console.error(e.stack);
@@ -312,51 +322,53 @@ app.post("/postselect", (req,res)=>{
   }})
 });
 
-app.post("/commented",(req,res)=>{
-  let postuserid;
-  let postquestionid;
-  // req.body.transcription
-  //選んだ投稿の宛名と問題文が見れる
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query( " SELECT a.postuser_id, a.question_id FROM appusers_questions a JOIN commentfromto c ON a.appusers_questions_id = c.postid ",
-      (error, results)=>{
-      console.log(results);
-      postuserid = results.rows.a.postuser_id;
-      postquestionid = results.rows.a.question_id;
-    })}})
+// app.get("/comment",(req,res)=>{
+//   let postuserid;
+//   let postquestionid;
+//   // req.body.transcription
+//   //選んだ投稿の宛名と問題文が見れる
+//   pool.connect((err, client) => {
+//     if (err) {
+//       console.log(err);
+//     } else {
+//       client.query( " SELECT a.postuser_id, a.question_id FROM appusers_questions a JOIN commentfromto c ON a.appusers_questions_id = c.postid ",
+//       (error, results)=>{
+//       console.log(results);
+//       postuserid = results.rows.a.postuser_id;
+//       postquestionid = results.rows.a.question_id;
+//     })}})
         
-  let postuser_name;
-  let post_question;
-  pool.connect((err, client) => {
-      if (err) {
-        console.log(err);
-      } else {
-        client.query( " select username from appusers where id = $1 ",
-        [postuserid],
-        (error, results)=>{
-        console.log(results);
-        postuser_name = results.rows.username;
-      })}})
+//   let postuser_name;
+//   let post_question;
+//   pool.connect((err, client) => {
+//       if (err) {
+//         console.log(err);
+//       } else {
+//         client.query( " select username from appusers where id = $1 ",
+//         [postuserid],
+//         (error, results)=>{
+//         console.log(results);
+//         postuser_name = results.rows.username;
+//       })}})
   
-      pool.connect((err, client) => {
-        if (err) {
-          console.log(err);
-        } else {
-          client.query( " select question from contents where wuestion_id = $1",
-          [postquestionid],
-          (error, results)=>{
-          console.log(results);
-          post_question = results.rows.question;
-          res.render("chat.ejs" ,{
-            postuser_name : postuser_name,
-            post_question : post_question
-          })
-        })}})
-      
+//       pool.connect((err, client) => {
+//         if (err) {
+//           console.log(err);
+//         } else {
+//           client.query( " select question from contents where question_id = $1",
+//           [postquestionid],
+//           (error, results)=>{
+//           console.log(results);
+//           post_question = results.rows.question;
+//           res.render("chat.ejs" ,{
+//             postuser_name : postuser_name,
+//             post_question : post_question
+//           })
+//         })}})
+//       }); 
 //コメントをする
+
+app.post("/commented",(req,res)=>{
   console.log(req.body);
     var query = {
     text : 'insert into commentstofrom (fromname, comment) values ($1, $2) ',

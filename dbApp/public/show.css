@@ -77,3 +77,47 @@ table{
     border-radius: 15px;
     margin-top: 40px;
 }
+
+* {
+    box-sizing: border-box;
+  }
+  
+  
+  h1 {
+    margin: 80px 0;
+    font-size: 40px;
+    text-align: center;
+  }
+  
+  
+  
+  .container {
+    width: 1000px;
+    margin: 0 auto;
+  }
+  
+  .sticky-container {
+    height: auto;
+    width: 100%;
+  }
+  
+  .sticky-item {
+    background: rgba(255, 255, 255, .4);
+    border: 6px solid #ffbb1e;
+    font-size: 20px;
+    margin: 40px 0;
+    padding: 24px 0 24px 16px;
+    width: 100%;
+  }
+  .container section:nth-child(2n) .sticky-item {
+    border: 6px solid red;
+  
+  }
+  p {
+    width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    letter-spacing: 0.1em;
+    line-height: 1.5;
+    color: #aaa;
+  }
