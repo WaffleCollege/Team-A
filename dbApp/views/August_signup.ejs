@@ -12,15 +12,7 @@
     <div class="form-wrapper">
        <h3>アカウント登録</h3>
         <!-- りつ：コメントアウト(9:47)<h1><a href="/list">BLOG</a></h1> -->
-        <div class="panel">
-          <% if (errors.length > 0) { %>
-            <ul class="errors" style="list-style: none;">
-              <% errors.forEach(error => { %>
-                <li><%= error %></li>
-              <% }); %>
-            </ul>
-          <% } %>
-        </div>
+      
         
            <!-- <form>タグに送信先URLと送信方法を指定してください。 -->
            <form action = "/signup" , method = "post">
