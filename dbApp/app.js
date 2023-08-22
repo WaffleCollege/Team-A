@@ -388,7 +388,7 @@ app.get("/show", (req, res, next) => {
 
 ///////show.ejs（投稿一覧）の中で選択した問題がpostIDとして指定できている//////
 
-///////////////////コメントを見る////////////////////////////
+///////////////////コメントを見る//////////////////////////
 app.get("/comments/:postId", (req, res) => {
   const postId = req.params.postId;
   
