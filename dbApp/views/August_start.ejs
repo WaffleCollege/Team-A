@@ -2,7 +2,7 @@
   <html>
     <head>
   
-      <!-- りつ：下挿入 -->
+      <!-- りつ：下挿入 ---->
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" href="../static/new.css" />
@@ -31,8 +31,8 @@
       <nav class="navbar navbar-expand-lg navbar-light bg-light ">
         <!-- ブランドロゴ -->
         <div class="container-fluid">
-           <span class="navbar-brand mb-0 h1" href="../問題/index.html" >PRODUCTNAME</span>
-     
+           <span class="navbar-brand mb-0 h1" href="../問題/index.html" >ASYNC</span>
+           <p><%= username %>さん</p>
             
         </div>
      </nav>
@@ -51,9 +51,11 @@
               <h4><span>「jadge0 APIキー」</span>をお持ちですか？</h4>
               <h5>お持ちの方は、はじめるボタンをタップ！</h5>
 
-              <div class="d-grid">
-                <input type="submit" value="はじめる"  class="btn btn-secondary">
-              </div>
+              <form action="/question" method="GET">
+                <div class="d-grid">
+                    <input type="submit" value="はじめる" class="btn btn-secondary">
+                </div>
+            </form>            
 
                 <h5>お持ちでない方は<a href="https://judge0.com/">こちら</a>をタップ！</h5>
                <h5>（タップ後、judge0のページに飛びます。）</h5>

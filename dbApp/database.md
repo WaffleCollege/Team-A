@@ -456,3 +456,13 @@ function save() {
          </div>
        </li>
     </ul> -->
+
+      <div class="panel">
+          <% if (errors.length > 0) { %>
+            <ul class="errors" style="list-style: none;">
+              <% errors.forEach(error => { %>
+                <li><%= error %></li>
+              <% }); %>
+            </ul>
+          <% } %>
+        </div>

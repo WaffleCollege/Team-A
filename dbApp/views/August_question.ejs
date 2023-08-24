@@ -1,4 +1,4 @@
-  <!-- ここから -->
+  <!-- ここから ---->
   <!DOCTYPE html>
 
 
@@ -46,7 +46,7 @@
         <!-- ブランドロゴ -->
           <div class="container-fluid">
             <span class="navbar-brand" href="question.ejs" >ASYNC</span>
-            <p><%= locals.username %>さん</p>
+            <p><%= username %>さん</p>
              <!-- アイコン部分（入ってないけど） -->
              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -55,9 +55,9 @@
               <!--ハンバーガーメニュー  改善：右の四角もう少し大きく-->
               <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav ms-auto">
-                     <a class="nav-link active" aria-current="page" href="index.html">Home</a>
-                     <a class="nav-link" href="/question">問題画面</a>
-                     <a class="nav-link" href="/show">投稿一覧</a>
+                     <a class="nav-link active" href="/August_start">Home</a>
+                     <a class="nav-link" href="/August_question">問題画面</a>
+                     <a class="nav-link" href="/August_show">投稿一覧</a>
                  </div>
              </diV>
   
@@ -80,36 +80,50 @@
       <a class="nav-link" href="/show"><span>タイムライン</span></a>
     </li>
   </ul>
+
+  <h1>問題一覧</h1>
+  <% questionsResult.forEach(question => { %>
+    <li>
+        <strong>ID: <%= question.question_id %></strong>
+        <p><%= question.question_content %></p>
+        <form action="/selectQuestion/<%= question.question_id %>" method="POST">
+            <input type="hidden" name="questionNumber" value="<%= question.question_id %>">
+            <input type="submit" value="この問題を選択">
+        </form>
+    </li>
+<% }); %>
   
-  <!-- "container mt-5" "col-sm-4"のclass消さないでください！-->
+  <h1>問題を投稿する</h1>
+
+    <form action="/postQuestion" method="POST">
+        <div>
+            <label for="question_content">問題内容:</label>
+            <textarea id="question_content" name="question_content" required></textarea>
+        </div>
+
+        <input type="hidden" name="creation_date" value="<%= new Date().toISOString() %>">
+
+        <div>
+            <input type="submit" value="投稿する">
+        </div>
+    </form>
+  <!-- "container mt-5" "col-sm-4"のclass消さないでください！
   <div class="container mt-5">
     
   
     <table class="table table-striped table-hover" id = qtbl>
       
-      <!-- テーブルの一番上の行 -->
+      テーブルの一番上の行
       
   
-     <!-- テーブルの2番目の行 -->
+     テーブルの2番目の行
       <tbody>
 
         <div class = "question">
-          <ul list-style-> 
-            <% questionsResult.forEach((item) => { %>
-              <li>       
-               <div class="id" name="id" >
-                <%= item.appusers_questions_id %>   
-              </div>
-              <div class="question"><%= item.question_id %>
-              </div>
-              <div class="question"><%= item.question %>
-              </div>
-          </li>
-          <% }) %>
-          </ul>
+         
     
     
-      </div>
+      </div> -->
 
 
        <!-- もし上野がおかしかったらこっちを復活 -->
@@ -120,25 +134,15 @@
         </form>
           <% }) %>
         </tr> -->
-      
+<!--       
       </tbody>
       
-    </table>
+    </table> -->
 
 
-<div>
-
-  <div class="anothe-page">
-    <input type="button" value="button1" id="mybtn1">
-    <script>
-      let button1 = document.getElementById('mybtn1');
-      button1.addEventListener('click', () => {
-          open('screenRecording.html');
-      });
-    </script>
-</div>
  
-
+ 
+<!-- 
 </div>
 <br>
   <form action = "/startpost" method = "post" >
@@ -166,7 +170,7 @@
     </div>
 
   </form>
-  </tbody>
+  </tbody> -->
   
   </body>
   </html>

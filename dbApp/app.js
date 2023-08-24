@@ -1,14 +1,21 @@
 // Express Server インスタンスを作成
+// node.jsはnpmというコマンドを使って今回使いたいモジュールを入れていきます。
+// 例）npm install ~
+// インストールしたものを最初に定義する必要があります。
+
 const express = require("express");
 const app = express();
 const session = require('express-session');
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 const pg = require("pg");
 const path = require("path");
 const PORT = 3000;
 require("dotenv").config({ debug: true });
 
 // POSTで、req.bodyでJSON受け取りを可能に
+// 一言で言うと、一般的なjavascriptのオブジェクトをJSON形式のデータに変換する感じみたいです。
+// 2017年まではbody-perserというnpmモジュールをimportしていましたが、今はその必要がなくなったそう。
+
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -23,17 +30,19 @@ app.set("view engine", "ejs");
 // htmlやcssファイルが保存されている publicフォルダ を指定
 app.use("/static", express.static(path.join(__dirname, "public")));
 
-// DBに接続
+// 今回のpostgreSQLの接続情報
 var pool = new pg.Pool({
-  database: "postgres",
-  user: "postgres", //ユーザー名はデフォルト以外を利用した人は適宜変更すること
-  password: "spark1000", //PASSWORDにはPostgreSQLをインストールした際に設定したパスワードを記述。
-  host: "localhost",
-  port: 5432
+  database: "teama",
+  user: "teama", 
+  password: "teama", //
+  host: "localhost", //デプロイしたらここが変わります
+  port: 5432        //postgreSQLはport番号は5432でほぼ固定
 });
 
 
-//user認証の準備OK
+//////////ユーザーのパスワード認証////////////
+
+//user認証（ここは過去にprogateのnode.jsを真似てやったもののままです、すごくそのままなので説明を省いています。）
 app.use(
   session({
     secret: 'my_secret_key',
@@ -53,100 +62,132 @@ app.use((req, res, next) => {
   next();
 });
 
-//登録sign.ejsOK
+//登録画面sign.ejs
 app.get('/signup', (req, res) => {
-  res.render('signup.ejs', { errors: [] });
+  res.render('August_signup.ejs', { errors: [] });
 });
 
 app.post('/signup', 
-  (req, res, next) => {
-    console.log('入力値の空チェック');
-    const username = req.body.username;
-    const email = req.body.email;
-    const password = req.body.password;
-    const errors = [];
-    if (username === '') {
-      errors.push('ユーザー名が空です');
-    }
-    if (email === '') {
-      errors.push('メールアドレスが空です');
-    }
-    if (password === '') {
-      errors.push('パスワードが空です');
-    }
-    if (errors.length > 0) {
-      res.render('signup.ejs', { errors: errors });
-    } else {
-      next();
-    }
-  },
-  (req, res, next) => {
-    console.log('メールアドレスの重複チェック');
-    const email = req.body.email;
-    const errors = [];
-    var query = {
-    text:  'select username, email, password from appusers where email = $1',
-    values: [req.body.email]
-  };
+    // 1. Check for empty input fields
+    (req, res, next) => {
+        console.log('入力値の空チェック');
+        const username = req.body.username;
+        const email = req.body.email;
+        const password = req.body.password;
+        const errors = [];
+        
+        if (username === '') {
+            errors.push('ユーザー名が空です');
+        }
+        if (email === '') {
+            errors.push('メールアドレスが空です');
+        }
+        if (password === '') {
+            errors.push('パスワードが空です');
+        }
+        
+        if (errors.length > 0) {
+            return res.render('August_signup.ejs', { errors: errors });
+        } 
+        next();
+    },
+  
+    // 2. Check for email duplication
+    (req, res, next) => {
+        console.log('メールアドレスの重複チェック');
+        const email = req.body.email;
+        const errors = [];
 
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-      errors.push('ユーザー登録に失敗しました');
-      res.render('signup.ejs', { errors: errors });
-    } else {
-      client
-        .query(query)
-        .then(() => {
-          next();
-        })
-        .catch(e => {
-          console.error(e.stack);
+        var query = {
+            text: 'select email from users where email = $1',
+            values: [email]
+        };
+
+        pool.connect((err, client) => {
+            if (err) {
+                console.log(err);
+                errors.push('データベースエラー');
+                return res.render('August_signup.ejs', { errors: errors });
+            } 
+
+            client.query(query)
+                .then(result => {
+                    if (result.rows.length > 0) {
+                        errors.push('メールアドレスは既に使用されています'); // 'Email already in use'
+                        return res.render('August_signup.ejs', { errors: errors });
+                    } 
+                    next();
+                })
+                .catch(e => {
+                    console.error(e.stack);
+                    if (!res.headersSent) {
+                        errors.push('データベースエラー');
+                        return res.render('August_signup.ejs', { errors: errors });
+                    }
+                });
         });
-      }})},
-      (req, res) => {
+    },
+  
+    // 3. Register the user
+    (req, res) => {
         console.log('ユーザー登録');
         const username = req.body.username;
         const email = req.body.email;
         const password = req.body.password;
-        bcrypt.hash(password, 10, (error, hash) => {
-          console.log(username, email, hash);
-          var query = {
-            text:  'insert into appusers (username, email, password) values ($1,$2,$3)',
-            values:  [username, email, hash]
-          };
-          pool.connect((err, client) => {
-            if (err) {
-              console.log(err);
-              res.redirect("/signup")
-              req.session.userId = results.insertId;
-              req.session.username = username;
-            } else {
-              client
-                .query(query)
-                .then(() => {
-                  res.redirect(`/login`);
-                })
-                .catch(e => {
-                  console.error(e.stack);
-                });
-              }})})},
-              );
+        
+        bcryptjs.hash(password, 10, (error, hash) => {
+            if (error) {
+                console.log(error);
+                return res.redirect("/signup");
+            }
+            
+            console.log(username, email, hash);
+            
+            var query = {
+                text:  'insert into users (username, email, password) values ($1,$2,$3)',
+                values:  [username, email, hash]
+            };
+            
+            pool.connect((err, client) => {
+                if (err) {
+                    console.log(err);
+                    return res.redirect("/signup");
+                } 
+                client
+                    .query(query)
+                    .then(() => {
+                        res.redirect(`/login`);
+                    })
+                    .catch(e => {
+                        console.error(e.stack);
+                        if (!res.headersSent) {
+                            return res.redirect("/signup");
+                        }
+                    });
+            });
+        });
+    }
+);
 
-//ログインlogin.ejsOK
+
+//ログイン
 app.get('/login', (req, res) => {
-  res.render('login.ejs');
+  res.render('August_login.ejs');
 });           
+
+//ちなみにこんなふうに同じ「/login」というエンドポイントに対して
+//get,postなどの複数のHTTPメソッドを使用することを
+//RESTFULなAPIと言ったりとか
 
 app.post('/login', (req, res) => {
   const email = req.body.email;
   pool.connect((err, client) => {
     if (err) {
       console.log(err);
-      res.render('login.ejs', { error: 'ログインに失敗しました' });
+      res.render('August_login.ejs', { error: 'ログインに失敗しました' });
     } else {
       client.query(
-        'SELECT * FROM appusers WHERE email = $1',
+        'SELECT * FROM users WHERE email = $1',
         [email],
         (error, results) => {
           if (results.rows.length > 0) {
@@ -155,11 +196,11 @@ app.post('/login', (req, res) => {
             // Define constant hash
             const hash = results.rows[0].password;
             // Add compare method to compare passwords
-            bcrypt.compare(plain, hash, (error, isEqual) => {
+            bcryptjs.compare(plain, hash, (error, isEqual) => {
               if (isEqual) {
-                req.session.userId = results.rows[0].id;
+                req.session.userId = results.rows[0].user_id;
                 req.session.username = results.rows[0].username;
-                res.redirect('/question');
+                res.redirect('/start');
               } else {
                 res.redirect('/login');
               }
@@ -173,140 +214,19 @@ app.post('/login', (req, res) => {
   });
 });
 
-//スタート画面
-app.get("/",(req,res)=>{
-  res.render("newstart.ejs")
-})
-app.post("/start", (req,res)=>{
-  res.render("login.ejs")
-})
+/////////////問題投稿機能//////////////
+//今回、大きく作り替えた点としては、問題番号と回答番号をsessionとして保持するという点です。
 
-//問題一覧を表示するquestion.ejsok
-app.get("/question", (req, res, next) => {
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query( 'select  question_id, question  from contents',
-      (error, results)=>{
-        console.log(results);
-        res.render("question.ejs",{
-        questionsResult:results.rows,
-        })
-})}})}); 
-
-app.get("/screenRecoding", (req,res)=>{
-  res.render("screenRecoding.ejs");
+//スタート画面表示
+app.get("/start",(req,res)=>{
+  res.render("August_start.ejs")
 })
 
-let appusers_questions_id; 
-let questionumber;
-//問題を選ぶquestion.ejs(これどうやって問題選ぼう。もう手入力にしました。この辺で通知送りたい。 なんか1しかでない。ok , (postuser_id) req.body.shareurl
-app.post('/startpost',(req, res, next) => {
-  console.log(req.session.username);
-  // console.log(req.session.userId);
-  console.log(req.body);
-  questionumber = Number(req.body.questionnum);
+/////////問題を投稿//////////
+app.post("/postQuestion",(req,res)=>{
     var query = {
-    text: "insert into appusers_questions (question_id, movieurl) values($1, $2) RETURNING appusers_questions_id",
-    values: [questionumber, req.body.shareurl]
-  };
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query(query)
-        .then(() => {;  //appuserquestion_id image.png 
-          res.redirect("/newcode2");
-        })
-        .catch(e => {
-          console.error(e.stack);
-        });
-}})
-});
-  // var query = {
-  //   text: "insert into up (username,question_id) values($1, $2)",
-  //   values: [req.session.username, req.body.questionnum]
-  // };
-  // pool.connect((err, client) => {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     client.query(query)
-  //       .then(() => {  //appuserquestion_id image.png 
-  //         res.redirect("/newcode");
-  //       })
-  //       .catch(e => {
-  //         console.error(e.stack);
-  //       });
-  // }})
-
-
-//コードの横に出る問題,コメント
-app.get("/newcode2", (req, res, next) => {
-  console.log(questionumber);
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query( 'select  question ,firstinput, firstoutput, secondinput, secondoutput from contents where question_id = $1',
-      [questionumber],
-      (error, results)=>{
-        console.log(results);
-        questionsResult = results.rows[questionumber-1];   
-        res.render("newcode2.ejs");
-})}})
-
-// pool.connect((err, client) => {
-//   if (err) {
-//     console.log(err);
-//   } else {
-//     client.query( " select id from appusers where username = $1 ",
-//     [req.session.name],
-//     (error, results)=>{
-//     console.log(results);
-//     postuser_id = results.rows.id;
-//   })}})
-
-// pool.connect((err, client) => {
-//   if (err) {
-//     console.log(err);
-//   } else {
-//     client.query( 'select fromname, comment from commentfromto where postid = postuser_id',
-//     (error, results)=>{
-//       console.log(results);
-//       commentssResult = results.rows;
-//       res.render("newcode.ejs",{
-//         questionsResult:questionsResult,
-//         commentssResult:commentssResult
-//       })
-// })}})
-}); 
-
-//投稿を並べる
-// select a.appusers_questions_id, a.question_id, a.username, a.movieurl, b.question, b.question_id from appusers_questions a left join questions b on a.question_id = b.question_id order by appusers_questions_id DESC;
-// let postusername ;
-app.get("/show", (req, res, next) => {
-  pool.connect((err, client) => {
-    if (err) {
-      console.log(err);
-    } else {
-      client.query( "select a.appusers_questions_id, a.question_id, a.username, a.movieurl, b.question, b.question_id from appusers_questions a left join contents b on a.question_id = b.question_id order by appusers_questions_id DESC ;",
-      (error, results)=>{
-      console.log(results);
-      // postusername = results.rows.username;
-      // postquestion = results.rows.question;
-      res.render("show.ejs",{
-      LivepostsResult:results.rows
-      })
-})}})});
-
-//（INSERT）投稿を見る画面においてユーザーBが入力した投稿番号という変数req.body.postnumをコメントデータベースに保存する。
-app.post("/postselect", (req,res)=>{
-  console.log(req.body);
-    var query = {
-    text : 'insert into commentfromto (postid) values ($1) ',
-    values : [req.body.postnum]
+    text : 'insert into questions (user_id, question_content, creation_date ) values ($1, $2, $3) ',
+    values : [req.session.userId, req.body.question_content, req.body.creation_date]
   };
   pool.connect((err, client) => {
     if (err) {
@@ -314,79 +234,267 @@ app.post("/postselect", (req,res)=>{
       client
         .query(query)
         .then(() => {
-          res.render("chat.ejs");
-        })
-        .catch(e => {
-          console.error(e.stack);
-        });
-  }})
-});
-
-// app.get("/comment",(req,res)=>{
-//   let postuserid;
-//   let postquestionid;
-//   // req.body.transcription
-//   //選んだ投稿の宛名と問題文が見れる
-//   pool.connect((err, client) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       client.query( " SELECT a.postuser_id, a.question_id FROM appusers_questions a JOIN commentfromto c ON a.appusers_questions_id = c.postid ",
-//       (error, results)=>{
-//       console.log(results);
-//       postuserid = results.rows.a.postuser_id;
-//       postquestionid = results.rows.a.question_id;
-//     })}})
-        
-//   let postuser_name;
-//   let post_question;
-//   pool.connect((err, client) => {
-//       if (err) {
-//         console.log(err);
-//       } else {
-//         client.query( " select username from appusers where id = $1 ",
-//         [postuserid],
-//         (error, results)=>{
-//         console.log(results);
-//         postuser_name = results.rows.username;
-//       })}})
-  
-//       pool.connect((err, client) => {
-//         if (err) {
-//           console.log(err);
-//         } else {
-//           client.query( " select question from contents where question_id = $1",
-//           [postquestionid],
-//           (error, results)=>{
-//           console.log(results);
-//           post_question = results.rows.question;
-//           res.render("chat.ejs" ,{
-//             postuser_name : postuser_name,
-//             post_question : post_question
-//           })
-//         })}})
-//       }); 
-//コメントをする
-
-app.post("/commented",(req,res)=>{
-  console.log(req.body);
-    var query = {
-    text : 'insert into commentstofrom (fromname, comment) values ($1, $2) ',
-    values : [req.session.name, req.body.comment]
-  };
-  pool.connect((err, client) => {
-    if (err) {
-    } else {
-      client
-        .query(query)
-        .then(() => {
-          res.redirect("/comment");
+          res.redirect("/question");
         })
         .catch(e => {
           console.error(e.stack);
         });
   }})});
+
+///////問題一覧を表示/////////
+app.get("/question", (req, res, next) => {
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query( 'select question_id, question_content from questions',
+      (error, results)=>{
+        console.log(results);
+        res.render("August_question.ejs",{
+        questionsResult:results.rows,
+        })
+})}})}); 
+
+////////////問題を選択/////////////
+//////////ここで問題番号と回答番号をグローバル変数にしておくという必要がなくなる///////////
+//let questionNumber;
+//let answerNumber;
+
+app.post('/selectQuestion/:number', (req, res) => {
+  console.log(req.session.userId);
   
+  // パラメータから問題番号を取得
+  const questionNumber = Number(req.params.number);
+
+  // 問題番号をsessionに保存
+  req.session.questionNumber = questionNumber;
+
+  const answerQuestion = {
+    text: "insert into answers (question_id, user_id) values($1, $2) RETURNING answer_id",
+    values: [questionNumber, req.session.userId]
+  };
+
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Database Connection Error");
+      return;
+    }
+
+    client.query(answerQuestion, (error, result) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send("Query Error");
+        return;
+      }
+
+      // 回答番号をsessionに保存
+      req.session.answerNumber = result.rows[0].answer_id;
+      res.redirect("/code");
+    });
+  });
+});
+
+///////////////解いている時の問題表示//////////////////
+
+
+app.get("/code", (req, res) => {  
+  pool.connect((err, client) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Database Connection Error");
+      return;
+    }
+
+    const query = 'select question_content from questions where question_id = $1';
+    client.query(query, [req.session.questionNumber], (error, results) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send("Query Error");
+        return;
+      }
+
+      if (results.rows.length === 0) {
+        res.status(404).send("Question not found.");
+        return;
+      }
+
+      res.render("August_code.ejs", { question: results.rows[0].question_content });
+    });
+  });
+});
+
+
+///////////解いたコードを保存////////////
+app.post("/postAnswer", (req, res, next) => {
+  let code = req.body.editorvalue;
+  
+  var updateAnswer = {
+      text: 'UPDATE answers SET answer_content = $1 WHERE user_id = $2 AND answer_id = $3',
+      values: [code, req.session.userId, req.session.answerNumber]
+  };
+  
+  pool.connect((err, client) => {
+      if (err) {
+          console.log(err);
+          res.status(500).send("Database Connection Error");
+          return;
+      }
+
+      client.query(updateAnswer)
+          .then(() => {
+              res.redirect("/question");
+          })
+          .catch(e => {
+              console.error(e.stack);
+              res.status(500).send("Query Execution Error");
+          });
+  });
+});
+
+/////////////投稿一覧を表示///////////////////
+app.get("/show", (req, res, next) => {
+  pool.connect((err, client, done) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Database Connection Error");
+      return;
+    }
+    const query = `
+      SELECT a.answer_id, a.answer_content, q.question_content, u.username
+      FROM answers a
+      JOIN users u ON a.user_id = u.user_id
+      JOIN questions q ON a.question_id = q.question_id
+      ORDER BY a.answer_id
+    `;
+
+    client.query(query, (error, results) => {
+      done();  // release the client to the pool
+
+      if (error) {
+        console.log(error);
+        res.status(500).send("Query Error");
+        return;
+      }
+      if (results.rows.length === 0) {
+        res.status(404).send("No answers found.");
+        return;
+      }
+      res.render("August_show.ejs", { posts: results.rows });
+    });
+  });
+});
+
+
+///////show.ejs（投稿一覧）の中で選択した問題がpostIDとして指定できている//////
+
+///////////////////コメントを見る//////////////////////////
+app.get("/comments/:postId", (req, res) => {
+  const postId = req.params.postId;
+  
+  pool.connect((err, client, done) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Database Connection Error");
+      return;
+    }
+
+    const Questquery = `
+      SELECT a.answer_id, a.answer_content, q.question_content, u.username
+      FROM answers a
+      JOIN users u ON a.user_id = u.user_id
+      JOIN questions q ON a.question_id = q.question_id
+      WHERE a.answer_id = $1
+    `;
+
+    const commentquery = 'SELECT comment_content FROM comments WHERE answer_id = $1';
+
+    client.query(Questquery, [postId], (error, result) => {
+      if (error) {
+        done();  
+        console.log(error);
+        res.status(500).send("Query Error");
+        return;
+      }
+      
+      if (result.rows.length === 0) {
+        done(); 
+        res.status(404).send("No answers found.");
+        return;
+      }
+
+      const post = result.rows[0];
+
+      client.query(commentquery, [postId], (commentError, commentResult) => {
+        done(); 
+        
+        if (commentError) {
+          console.log(commentError);
+          res.status(500).send("Query Error");
+          return;
+        }
+
+        const comments = commentResult.rows;
+        res.render("August_comment.ejs", { post: post, comments: comments });
+      });
+    });
+  });
+});
+
+
+///////////////////コメントをする///////////////////////
+app.post("/comments/:postId", (req, res) => {
+  const postId = req.params.postId;
+  const comment = req.body.comment;
+
+  // 1. answers データベースから userID と answerID を取得
+  const getAnswerQuery = `
+    SELECT user_id, answer_id 
+    FROM answers 
+    WHERE answer_id = $1
+  `;
+
+  pool.connect((err, client, done) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Database Connection Error");
+      return;
+    }
+
+    client.query(getAnswerQuery, [postId], (error, result) => {
+      done();
+
+      if (error) {
+        console.log(error);
+        res.status(500).send("Query Error");
+        return;
+      }
+
+      if (result.rows.length === 0) {
+        res.status(404).send("Answer not found.");
+        return;
+      }
+
+      const answer = result.rows[0];
+
+      // 2. 取得した情報とリクエストからのコメント内容を用いて、comments データベースにデータを保存
+      const insertCommentQuery = {
+        text: "INSERT INTO comments (from_user_id, to_user_id, answer_id, comment_content) VALUES ($1, $2, $3, $4)",
+        values: [req.session.userId, answer.user_id, answer.answer_id, comment]
+      };
+
+      client.query(insertCommentQuery, (insertError) => {
+        if (insertError) {
+          console.log(insertError);
+          res.status(500).send("Error inserting comment.");
+          return;
+        }
+
+        res.redirect("/comments/" + postId);
+      });
+    });
+  });
+});
 
 //サーバー立ち上げ
 app.listen(PORT, function(err) {
@@ -394,459 +502,3 @@ app.listen(PORT, function(err) {
   console.log("Start Server!");
 });
 
-
-// //コードを保存する
-// app.post("/save",(req,res)=>{
-//    let code = editorvalue;
-//    console.log(req.body);
-//    var query = {
-//    text : 'insert into appusers_questions (codes) values ($1) where id = $2',
-//    values : [editorvalue, appusers_questions_id]
-//  };
-//  pool.connect((err, client) => {
-//    if (err) {
-//      console.log(err);
-//    } else {
-//      client
-//        .query(query)
-//        .then(() => {
-//          res.redirect("/question");
-//        })
-//        .catch(e => {
-//          console.error(e.stack);
-//        });
-//  }})});
-
-
-//音声とノートを終了時に投稿する 
-// app.post("/savetext",(req,res)=>{
-//   // req.body.transcription
-//   console.log(req.body);
-//     var query = {
-//     text : 'insert into appusers_questions (transcription, codes, note) values ($1, $2) where id = $4',
-//     values : [req.body.transcription, req.body.note, appusers_questions_id]
-//   };
-//   pool.connect((err, client) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       client
-//         .query(query)
-//         .then(() => {
-//           res.redirect("/show");
-//         })
-//         .catch(e => {
-//           console.error(e.stack);
-//         });
-//   }})});
-
-
-
-//投稿一覧を表示するshow.ejs
-// app.get("/show", (req, res, next) => {
-//   pool.connect((err, client) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       client.query( "select question_id, postuser_id, shareurl from appusers_questions where transcription is null  ORDER BY appusers_questions_id DESC",
-//       (error, results)=>{
-//       console.log(results);
-//       res.render("show.ejs",{
-//       LivepostsResult:results.rows
-//       })
-// })}})
-//   pool.connect((err, client) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       client.query( "select question_id, postuser_id, transcription, codes from appusers_questions where transcription is not null  ORDER BY appusers_questions_id DESC",
-//       (error, results)=>{
-//         console.log(results);
-//         res.render("show.ejs",{
-//         FinishedpostsResult:results.rows
-//         })
-// })}})
-// });
-
-// //コメント画面に飛ぶ
-// app.get('/new',(req,res)=>{
-//   res.render('new.ejs');
-// })
-
-// //投稿を選んでコメントを書き込
-// let comment;
-// app.post('/comment',(req, res, next) => {
-//   comment = req.body.comment;//このidに宛名の投稿のnameタグが入るのでもしつくったら入れたい！
-//   console.log(req.body);
-//     var query = {
-//     text: "insert into commenttexts (appusers_questions_id,commenter_id, codecomment, comment) values($1, $2, $3)",
-//     values: [appusers_questions_id, req.session.id, req.body.codecomment, req.body.comment]
-//   };
-//   pool.connect((err, client) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       client
-//         .query(query)
-//         .then(() => {
-//           res.redirect("/show");
-//         })
-//         .catch(e => {
-//           console.error(e.stack);
-//         });
-//   }})});
-
-
-
-
-// app.get("/execute", async (req, res) => {
-//   // judge0 APIを呼び出す
-//   //  => 受け取ったコード(editorValue)を入れる
-//   //まずトークンを呼ぶpost
-//   function tokengiven(){
- 
-  
-
-
-
- 
-
-  //"judge0を呼びだした結果" 
-  // ボールをwrite.ejsに返す ; 
-
-
- 
-
-
-
-// app.post("/compile", (req, res) => {
-// const fetch = require('node-fetch');
-//  // {"language_id":52,"source_code":btoa(editorValue),"stdin":"stdin"};
-//"SnVkZ2Uw"
-//   const url = 'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=true&fields=*';
-  
-//   const options = {
-//     method: 'POST',
-//     headers: {
-//       'content-type': 'application/json',
-//       'Content-Type': 'application/json',
-//       'X-RapidAPI-Key': 'secret',
-//       'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
-//     },
-//     body: JSON.stringify({"language_id":52,"source_code":code,"stdin":"SnVkZ2Uw"})
-//   };
-  
-//   fetch(url, options)
-//     .then(res => res.json())
-//     .then(json => {
-//       console.log(json);
-
-//       if (!json.token) {
-//         throw new Error('Token not found in network response');
-//       }
-
-//       const token = json.token;
-//       let submissionStatus = 'Processing';
-  
-//       const checkStatus = () => {
-//         return fetch(`https://judge0-ce.p.rapidapi.com/submissions/${token}`, {
-//           headers: {
-//             'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40' // Replace this with your own API key
-//           }
-//         })
-//         .then(response => {
-//           if (!response.ok) {
-//             throw new Error('Network response was not ok');
-//           }
-//           return response.json();
-//         })
-//         .then(data => {
-//           if (!data.status) {
-//             throw new Error('Status not found in network response');
-//           }
-  
-//           submissionStatus = data.status.description;
-  
-//           if (submissionStatus !== 'Completed') {
-//             return new Promise(resolve => {
-//               setTimeout(resolve, 1000);
-//             })
-//             .then(() => {
-//               return checkStatus();
-//             });
-//           } else {
-//             return data;
-//           }
-//         });
-//       };
-  
-//       return checkStatus();
-//     })
-//     .then(submissionDetails => {
-//       const final = submissionDetails.stdout;
-//       console.log(final);
-//       res.render('show.ejs',{final:final});
-//     })
-//     .catch(error => {
-//       console.error(error);
-//       res.status(500).send('An error occurred');
-//     });
-// });
-
-// //https://judge0-ce.p.rapidapi.com/submissions
-//   fetch('https://judge0-ce.p.rapidapi.com/submissions', {
-//     method: 'POST',
-//     params: {base64_encoded: 'true', fields: '*'},
-//     headers: {
-//       'content-type': 'application/json',
-//       'Content-Type': 'application/json',
-//       'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40',
-//       'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
-//     },
-//     data: JSON.stringify({
-//       source_code: code,
-//       language_id: 71, // Change this to the desired language ID
-//       stdin: '', // Provide input as needed
-//       expected_output: '', // Provide expected output as needed
-//       cpu_time_limit: 2, // Change this to the desired CPU time limit in seconds
-//       language_code: 'python' // Change this to the desired language code
-
-//     })
-
-
-   
-
-
-
-// const bodyParser = require('body-parser');
-// const axios = require('axios');
-
-// app.use(bodyParser.json());
-// let editorValue = '';
-// app.post("/compile", async (req, res) => {
-//   console.log(editorValue);
-//   const code = editorValue;
-
-//   try {
-//     const response = await axios.post('https://judge0-ce.p.rapidapi.com/submissions', {
-//       source_code: code,
-//       language_id: 71, // Change this to the desired language ID
-//       stdin: '', // Provide input as needed
-//       expected_output: '', // Provide expected output as needed
-//       cpu_time_limit: 2, // Change this to the desired CPU time limit in seconds
-//       language_code: 'python' // Change this to the desired language code
-//     }, {
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40'
-//       }
-//     });
-
-//     if (!response.data.token) {
-//       throw new Error('Network response was not ok');
-//     }
-
-//     const token = response.data.token;
-//     let submissionStatus = 'Processing';
-
-//     const checkStatus = async () => {
-//       const statusResponse = await axios.get(`https://judge0-ce.p.rapidapi.com/submissions/${token}`, {
-//         headers: {
-//           'X-RapidAPI-Key': '71aec70437mshf7a8d2deedb33f1p185b10jsn924da6036e40' // Replace this with your own API key
-//         }
-//       });
-
-//       if (!statusResponse.data.status) {
-//         throw new Error('Network response was not ok');
-//       }
-
-//       submissionStatus = statusResponse.data.status.description;
-
-//       if (submissionStatus !== 'Completed') {
-//         await new Promise(resolve => {
-//           setTimeout(resolve, 1000);
-//         });
-//         return checkStatus();
-//       } else {
-//         return statusResponse.data;
-//       }
-//     };
-
-//     const submissionDetails = await checkStatus();
-//     const final = submissionDetails.stdout;
-//     console.log(final);
-//     res.render('show.ejs',{final:final})
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('An error occurred');
-//   }
-// });
-    // pool.query(
-      // 'SELECT username, email, password FROM test_schema.user_table WHERE email = ?',
-      // [email],
-    //   (error, results) => {
-    //     console.log(results);
-    //     if (results !== []) {
-    //       errors.push('ユーザー登録に失敗しました');
-    //       res.render('signup.ejs', { errors: errors });
-    //     } else {
-    //       next();
-    //     }
-    //   }
-    // );
- 
-
-  //     pool.query(
-  //       'INSERT INTO test_schema.user_table (username, email, password) VALUES (?, ?, ?)',
-  //       [username, email, hash],
-  //       (error, results) => {
-  //         req.session.userId = results.insertId;
-  //         req.session.username = username;
-  //         res.redirect('/');
-  //       }
-  //     );
-  //   });
-  // }
-
-
-
-
-//   pool.query(
-//     'SELECT * FROM test_schema.user_table WHERE email = ?',
-//     [email],
-//     (error, results) => {
-//       console.log(results);
-//       if (results !== []) {
-//         // 定数plainを定義してください
-//         const plain = req.body.password;
-        
-//         // 定数hashを定義してください
-//         const hash = results[0].password;
-        
-//         // パスワードを比較するためのcompareメソッドを追加してください
-//         bcrypt.compare(plain, hash, (error,isEqual) =>{
-//           if(isEqual){
-//             req.session.userId = results[0].id;
-//             req.session.username = results[0].username;
-//             res.redirect('/');
-//           }else{
-//             res.redirect("/login");
-//           }
-//         })
-//       } else {
-//         res.redirect('/login');
-//       }
-//     }
-//   );
-// });
-
-// app.listen(PORT, function(err) {
-//   if (err) console.log(err);
-//   console.log("Start Server!");
-// });
-
-// app.get('/logout', (req, res) => {
-//   req.session.destroy((error) => {
-//     res.redirect('/');
-//   });
-// });
-
-//ユーザー認証 auth0
-  // const {auth, requiresAuth} = require('express-openid-connect')
-
-  // if (require.main === module) {
-  //   main()
-  // }
-  
-  // async function main () {
-  //   try {
-  //       app.use(auth({ // <1>
-  //       authRequired: false,
-  //       auth0Logout: true,
-  //       secret: process.env.AUTH0_SECRET,
-  //       baseURL: process.env.AUTH0_BASE_URL,
-  //       clientID: process.env.AUTH0_CLIENT_ID,
-  //       issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL,
-  //     }))
-  
-  //       app.get('/', (req, res) => { // <2>
-  //       res.send({isPrivate: false})
-  //     })
-  
-  //       app.use('/private/', requiresAuth()) // <3>
-  
-  //       app.get('/private/', (req, res) => { // <4>
-  //       res.send({isPrivate: true, sub: req.oidc.user.sub}) // <5>
-  //     })
-  
-  //       app.listen(process.env.PORT, () => { // <6>
-  //       console.info(`Listening on ${process.env.PORT}`)
-  //     })
-  //   } catch (err) {
-  //     console.error(err)
-  //   }
-  // }
-
-  // app.post("/update", (req, res, next) => {
-  //   console.log(req.body);
-  //     var query = {
-  //     text:
-  //       "update test_schema.re_test_table set price=340 where id=' ';"
-  //       "INSERT INTO  (question, answer) VALUES($1, $2)",
-  //       values: [req.body.question,req.body.answer]
-  //   };
-  
-    // pool.connect((err, client) => {
-    //   if (err) {
-    //     console.log(err);
-    //   } else {
-    //     client
-    //       .query(query)
-    //       .then(() => {
-    //         res.redirect("/show");
-    //       })
-    //       .catch(e => {
-    //         console.error(e.stack);
-    //       });
-    // }})});
-
-
-  
-  
-
-// app.get("/", (req, res, next) => {
-//   // データベースからデータを読み込む
-//   pool.connect((err, client) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       // query関数の第一引数にSQL文をかく
-//       client.query("SELECT name FROM goya",
-//        (err, result) => {
-//         res.render("index", {
-//           title: "Express",
-//           name: result.rows[0].name
-//         });
-
-//         //コンソール上での確認用
-//         console.log(result);
-//       });
-//     }
-//   });
-// });
-
-
-
-  // console.log(req.body);
-  // (Challenge)すでにDBにあるコメントを表示
-  // pool.connect((err, client) => {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     // query関数の第一引数にSQL文をかく
-  //     client.query("SELECT name FROM users",
-  //      (err, result) => {
-  //     res.render("showComments.ejs", {
-  //     title: "Express",
-  //     name: result.rows[0].name
-  //     })})};
